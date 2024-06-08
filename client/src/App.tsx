@@ -1,21 +1,47 @@
 import React, { useEffect } from "react";
 import "./App.css";
 
+type Person = { name: string };
+
 function App() {
+  const [name, setName] = React.useState<string>("");
+  const [people, setPeople] = React.useState<Person[]>([]);
+
+  const fetchPeople = async () => {
+    const res = await fetch("/api/people");
+    const data = await res.json();
+    setPeople(data);
+  };
+
   useEffect(() => {
-    const sayHello = async () => {
-      const response = await fetch("/api/hello");
-      const body = await response.json();
-      console.log(body);
-    };
-    sayHello();
+    fetchPeople();
   }, []);
+
+  const handleJoin = async () => {
+    const res = await fetch("/api/join", {
+      method: "POST",
+      body: JSON.stringify({ name }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    fetchPeople();
+  };
 
   return (
     <div className="App">
-      <header className="App-header">
-        <p>Hello!</p>
-      </header>
+      <h1>Attendees</h1>
+      <ul>
+        {people.map((person, i) => (
+          <li key={i}>{person.name}</li>
+        ))}
+      </ul>
+      <p>Please enter your name</p>
+      <form onSubmit={handleJoin}>
+        <input onChange={(e) => setName(e.currentTarget.value)} />
+        <button type="submit">Join</button>
+      </form>
     </div>
   );
 }
