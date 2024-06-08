@@ -1,18 +1,23 @@
 import { log } from "console";
+import { create } from "domain";
 import express from "express";
+import { createServer } from "http";
 import path from "path";
+import { Server } from "socket.io";
 
 export type Person = { name: string };
 
 const PORT = process.env.PORT || 8000;
 
 const app = express();
+const server = createServer(app);
+const io = new Server(server);
 
 app.use(express.json());
 // Serve the React static files after build
 app.use(express.static("../client/build"));
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);
 });
 
@@ -22,6 +27,7 @@ app.post("/api/join", (req, res) => {
   console.log(req.body);
   const person = { name: req.body.name };
   people.push(person);
+  io.emit("people", people);
   res.json({ message: "joined" });
 });
 
