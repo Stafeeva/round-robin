@@ -40,7 +40,7 @@ function App() {
   const [people, setPeople] = React.useState<Person[]>([]);
 
   const fetchPeople = async () => {
-    const res = await fetch("/api/people");
+    const res = await fetch("/api/attendee");
     const data = await res.json();
     setPeople(data);
   };
@@ -48,7 +48,7 @@ function App() {
   useEffect(() => {
     fetchPeople();
 
-    socket.on("people", (data: Person[]) => {
+    socket.on("attendees", (data: Person[]) => {
       setPeople(data);
     });
   }, []);
