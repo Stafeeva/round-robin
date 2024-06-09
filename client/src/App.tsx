@@ -37,31 +37,70 @@ const Join: FC = () => {
 };
 
 function App() {
-  const [people, setPeople] = React.useState<Person[]>([]);
+  const [meeting, setMeeting] = React.useState<any>({});
 
-  const fetchPeople = async () => {
-    const res = await fetch("/api/attendee");
+  const fetchMeeting = async () => {
+    const res = await fetch("/api/meeting");
     const data = await res.json();
-    setPeople(data);
+    setMeeting(data);
   };
 
   useEffect(() => {
-    fetchPeople();
+    fetchMeeting();
 
-    socket.on("attendees", (data: Person[]) => {
-      setPeople(data);
+    // TODO: type for data
+    socket.on("meetingUpdated", (data: any) => {
+      setMeeting(data);
     });
   }, []);
 
+  const handleStartMeeting = async () => {
+    const res = await fetch("/api/meeting:start", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  };
+
+  const handleNext = async () => {
+    const res = await fetch("/api/meeting:next", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  };
+
+  const handleResetMeeting = async () => {
+    const res = await fetch("/api/meeting:reset", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  };
+
   return (
     <div className="App">
-      <h1>Attendees</h1>
+      <h2>Attendees</h2>
       <ul>
-        {people.map((person, i) => (
+        {meeting?.attendees?.map((person: Person, i: number) => (
           <li key={i}>{person.name}</li>
         ))}
       </ul>
       <Join />
+      <h2>Meeting: {meeting?.meetingState}</h2>
+      <button onClick={handleStartMeeting}>Start</button>
+      <button onClick={handleNext}>Next</button>
+      <button onClick={handleResetMeeting}>Reset </button>
+      <h2>Current Speaker: {meeting?.currentSpeaker?.name}</h2>
+      <h2>Speaker Queue</h2>
+      <ul>
+        {meeting?.speakerQueue?.map((person: Person, i: number) => (
+          <li key={i}>{person.name}</li>
+        ))}
+      </ul>
     </div>
   );
 }

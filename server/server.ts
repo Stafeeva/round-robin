@@ -42,7 +42,12 @@ app.post("/api/join", (req, res) => {
   // TODO: Validate the name is unique
   const person = { name: req.body.name };
   attendees.push(person);
-  io.emit("attendees", attendees);
+
+  console.log("Attendees", attendees);
+  io.emit("meetingUpdated", getMeeting());
+
+  // TODO: what if meeting already started?
+
   res.json({ message: "joined" });
 });
 
@@ -69,6 +74,7 @@ app.get("/api/meeting", (req, res) => {
   res.json(getMeeting());
 });
 
+// TODO: move this to a utility file
 const shuffleArray = (array: Attendee[]) => {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -78,8 +84,11 @@ const shuffleArray = (array: Attendee[]) => {
 };
 
 // https://cloud.google.com/apis/design/custom_methods
+// test
 
 app.post("/api/meeting[:]start", (req, res) => {
+  // TODO: only allow starting meeting if in notstarted state
+
   // Start the meeting
   meetingState = MeetingState.InProgress;
   // Define a random order for the attendees
@@ -88,10 +97,14 @@ app.post("/api/meeting[:]start", (req, res) => {
   // Start with the first speaker
   currentSpeaker = speakerQueue.shift();
 
+  io.emit("meetingUpdated", getMeeting());
+
   res.json(getMeeting());
 });
 
 app.post("/api/meeting[:]next", (req, res) => {
+  // TODO: only allow next if the meeting is in progress
+
   // Move to the next attendee
   currentSpeaker = speakerQueue.shift();
 
@@ -100,5 +113,19 @@ app.post("/api/meeting[:]next", (req, res) => {
     meetingState = MeetingState.Ended;
   }
 
+  io.emit("meetingUpdated", getMeeting());
   res.json(getMeeting());
 });
+
+app.post("/api/meeting[:]reset", (req, res) => {
+  resetMeeting();
+
+  io.emit("meetingUpdated", getMeeting());
+  res.json(getMeeting());
+});
+
+const resetMeeting = () => {
+  meetingState = MeetingState.NotStarted;
+  speakerQueue = [];
+  currentSpeaker = undefined;
+};
