@@ -84,7 +84,6 @@ const shuffleArray = (array: Attendee[]) => {
 };
 
 // https://cloud.google.com/apis/design/custom_methods
-// test
 
 app.post("/api/meeting[:]start", (req, res) => {
   // TODO: only allow starting meeting if in notstarted state

@@ -11,7 +11,7 @@ const Join: FC = () => {
   const [name, setName] = React.useState<string>("");
 
   const handleJoin = async () => {
-    const res = await fetch("/api/join", {
+    await fetch("/api/join", {
       method: "POST",
       body: JSON.stringify({ name }),
       headers: {
@@ -55,7 +55,7 @@ function App() {
   }, []);
 
   const handleStartMeeting = async () => {
-    const res = await fetch("/api/meeting:start", {
+    await fetch("/api/meeting:start", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -64,7 +64,7 @@ function App() {
   };
 
   const handleNext = async () => {
-    const res = await fetch("/api/meeting:next", {
+    await fetch("/api/meeting:next", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -73,7 +73,7 @@ function App() {
   };
 
   const handleResetMeeting = async () => {
-    const res = await fetch("/api/meeting:reset", {
+    await fetch("/api/meeting:reset", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -83,24 +83,43 @@ function App() {
 
   return (
     <div className="App">
-      <h2>Attendees</h2>
-      <ul>
-        {meeting?.attendees?.map((person: Person, i: number) => (
-          <li key={i}>{person.name}</li>
-        ))}
-      </ul>
-      <Join />
-      <h2>Meeting: {meeting?.meetingState}</h2>
-      <button onClick={handleStartMeeting}>Start</button>
-      <button onClick={handleNext}>Next</button>
-      <button onClick={handleResetMeeting}>Reset </button>
-      <h2>Current Speaker: {meeting?.currentSpeaker?.name}</h2>
-      <h2>Speaker Queue</h2>
-      <ul>
-        {meeting?.speakerQueue?.map((person: Person, i: number) => (
-          <li key={i}>{person.name}</li>
-        ))}
-      </ul>
+      <main>
+        <div className="meeting-container">
+          <h2>Meeting: {meeting?.meetingState}</h2>
+          <div className="meeting-actions">
+            {meeting?.meetingState === "NotStarted" ? (
+              <button onClick={handleStartMeeting}>Start</button>
+            ) : (
+              <button onClick={handleResetMeeting}>Reset</button>
+            )}
+            {meeting?.meetingState === "InProgress" && (
+              <button onClick={handleNext}>
+                {meeting?.speakerQueue?.length === 0 ? "Finish" : "Next"}
+              </button>
+            )}
+          </div>
+          {meeting?.meetingState === "InProgress" && (
+            <>
+              <h2>Current Speaker: {meeting?.currentSpeaker?.name}</h2>
+              <h2>Speaker Queue</h2>
+              <ul>
+                {meeting?.speakerQueue?.map((person: Person, i: number) => (
+                  <li key={i}>{person.name}</li>
+                ))}
+              </ul>
+            </>
+          )}
+        </div>
+        <div className="attendees">
+          <h2>Attendees</h2>
+          <ul>
+            {meeting?.attendees?.map((person: Person, i: number) => (
+              <li key={i}>{person.name}</li>
+            ))}
+          </ul>
+          <Join />
+        </div>
+      </main>
     </div>
   );
 }
