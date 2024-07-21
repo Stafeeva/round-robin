@@ -2,15 +2,24 @@
   text-align: center;
 }
 
+h2 {
+  margin: 5px;
+}
 main {
   width: 100%;
   max-width: 1600px;
   display: flex;
+  flex-direction: column;
 }
 
 ul {
   list-style: none;
   padding: 0;
+}
+
+.container {
+  display: flex;
+  justify-content: space-between;
 }
 
 .meeting-container {
@@ -19,6 +28,7 @@ ul {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  background-color: #6bd5e1;
 }
 
 .meeting-actions {
@@ -29,4 +39,32 @@ ul {
 
 .attendees {
   width: 25%;
+  background-color: #ffd98e;
+}
+
+.attendees li.active {
+  font-weight: bolder;
+}
+
+.notes {
+  width: 50%;
+  background-color: #ffb677;
+}
+
+.actions {
+  width: 50%;
+  background-color: #ff8364;
+}
+
+.join {
+  align-items: center;
+  background-color: #6bd5e1;
+  width: 100%;
+}
+
+.speakers p {
+  margin: 5px;
+}
+span.speaker {
+  margin-right: 12px;
 }

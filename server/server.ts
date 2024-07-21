@@ -5,6 +5,10 @@ import { Server } from "socket.io";
 
 export type Attendee = { name: string };
 
+export type Note = { author: string; text: string };
+
+export type Action = { assignee: string; text: string };
+
 const PORT = process.env.PORT || 8000;
 
 const app = express();
@@ -19,11 +23,11 @@ server.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);
 });
 
-const attendees: Attendee[] = [
-  { name: "John" },
-  { name: "Jane" },
-  { name: "Alice" },
-];
+const attendees: Attendee[] = [];
+
+const notes: Note[] = [];
+
+const actions: Action[] = [];
 
 enum MeetingState {
   NotStarted = "NotStarted",
@@ -128,3 +132,27 @@ const resetMeeting = () => {
   speakerQueue = [];
   currentSpeaker = undefined;
 };
+
+app.get("/api/note", (req, res) => {
+  res.json(notes);
+});
+
+app.post("/api/note", (req, res) => {
+  const note = req.body;
+  notes.push(note);
+  io.emit("noteAdded", notes);
+
+  res.status(201).json({ message: "Note added" });
+});
+
+app.get("/api/action", (req, res) => {
+  res.json(actions);
+});
+
+app.post("/api/action", (req, res) => {
+  const action = req.body;
+  actions.push(action);
+  io.emit("actionAdded", actions);
+
+  res.status(201).json({ message: "Action added" });
+});
