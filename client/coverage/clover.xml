@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1721644180569" clover="3.2.0">
+  <project timestamp="1721644180569" name="All files">
+    <metrics statements="59" coveredstatements="18" conditionals="10" coveredconditionals="3" methods="25" coveredmethods="4" elements="94" coveredelements="25" complexity="0" loc="59" ncloc="59" packages="1" files="5" classes="5"/>
+    <file name="App.tsx" path="/Users/natalia.stafeeva/CS/FINAL/round-robin/client/src/App.tsx">
+      <metrics statements="23" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="11" coveredmethods="0"/>
+      <line num="8" count="0" type="stmt"/>
+      <line num="10" count="0" type="stmt"/>
+      <line num="11" count="0" type="stmt"/>
+      <line num="13" count="0" type="stmt"/>
+      <line num="14" count="0" type="stmt"/>
+      <line num="23" count="0" type="stmt"/>
+      <line num="26" count="0" type="stmt"/>
+      <line num="29" count="0" type="stmt"/>
+      <line num="30" count="0" type="stmt"/>
+      <line num="36" count="0" type="stmt"/>
+      <line num="44" count="0" type="stmt"/>
+      <line num="45" count="0" type="stmt"/>
+      <line num="46" count="0" type="stmt"/>
+      <line num="48" count="0" type="stmt"/>
+      <line num="49" count="0" type="stmt"/>
+      <line num="57" count="0" type="stmt"/>
+      <line num="60" count="0" type="stmt"/>
+      <line num="63" count="0" type="stmt"/>
+      <line num="64" count="0" type="stmt"/>
+      <line num="71" count="0" type="stmt"/>
+      <line num="75" count="0" type="stmt"/>
+      <line num="83" count="0" type="stmt"/>
+      <line num="92" count="0" type="stmt"/>
+    </file>
+    <file name="CreateMeeting.tsx" path="/Users/natalia.stafeeva/CS/FINAL/round-robin/client/src/CreateMeeting.tsx">
+      <metrics statements="2" coveredstatements="2" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
+      <line num="8" count="1" type="stmt"/>
+      <line num="9" count="1" type="stmt"/>
+    </file>
+    <file name="Home.tsx" path="/Users/natalia.stafeeva/CS/FINAL/round-robin/client/src/Home.tsx">
+      <metrics statements="2" coveredstatements="2" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
+      <line num="7" count="1" type="stmt"/>
+      <line num="8" count="3" type="stmt"/>
+    </file>
+    <file name="Join.tsx" path="/Users/natalia.stafeeva/CS/FINAL/round-robin/client/src/Join.tsx">
+      <metrics statements="8" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="4" coveredmethods="1"/>
+      <line num="4" count="2" type="stmt"/>
+      <line num="6" count="2" type="stmt"/>
+      <line num="7" count="0" type="stmt"/>
+      <line num="15" count="0" type="stmt"/>
+      <line num="18" count="2" type="stmt"/>
+      <line num="27" count="0" type="stmt"/>
+      <line num="28" count="0" type="stmt"/>
+      <line num="31" count="0" type="stmt"/>
+    </file>
+    <file name="Meeting.tsx" path="/Users/natalia.stafeeva/CS/FINAL/round-robin/client/src/Meeting.tsx">
+      <metrics statements="24" coveredstatements="11" conditionals="10" coveredconditionals="3" methods="8" coveredmethods="1"/>
+      <line num="16" count="1" type="stmt"/>
+      <line num="17" count="1" type="stmt"/>
+      <line num="19" count="1" type="stmt"/>
+      <line num="21" count="1" type="stmt"/>
+      <line num="23" count="1" type="stmt"/>
+      <line num="24" count="0" type="stmt"/>
+      <line num="25" count="0" type="stmt"/>
+      <line num="26" count="0" type="stmt"/>
+      <line num="29" count="1" type="stmt"/>
+      <line num="30" count="0" type="stmt"/>
+      <line num="31" count="0" type="stmt"/>
+      <line num="32" count="0" type="stmt"/>
+      <line num="35" count="1" type="stmt"/>
+      <line num="36" count="0" type="stmt"/>
+      <line num="37" count="0" type="stmt"/>
+      <line num="38" count="0" type="stmt"/>
+      <line num="60" count="1" type="stmt"/>
+      <line num="61" count="0" type="stmt"/>
+      <line num="69" count="1" type="stmt"/>
+      <line num="70" count="0" type="stmt"/>
+      <line num="78" count="1" type="stmt"/>
+      <line num="79" count="0" type="stmt"/>
+      <line num="87" count="1" type="stmt"/>
+      <line num="160" count="0" type="stmt"/>
+    </file>
+  </project>
+</coverage>

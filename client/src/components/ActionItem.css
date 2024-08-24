@@ -1,0 +1,18 @@
+.action-item__container {
+  display: flex;
+  align-items: middle;
+  justify-content: space-between;
+}
+
+.action-item__message {
+  padding-top: 4px;
+}
+
+.action-item__message--completed {
+  text-decoration: line-through;
+}
+
+.action-item__actions {
+  display: flex;
+  margin-left: 16px;
+}
