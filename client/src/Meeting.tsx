@@ -1,6 +1,6 @@
-import React, { FC, useEffect } from "react";
+import React, { useEffect } from "react";
 import { io } from "socket.io-client";
-import { Avatar, Button, Flex, Skeleton } from "antd";
+import { Avatar, Button, Flex } from "antd";
 import {
   UserOutlined,
   ClockCircleFilled,
@@ -42,22 +42,22 @@ const Meeting = ({ attendeeName }: { attendeeName: string }) => {
   };
 
   useEffect(() => {
-    // fetchMeeting();
+    fetchMeeting();
     fetchNotes();
-    // fetchActions();
+    fetchActions();
 
     // TODO: type for data
-    // socket.on("meetingUpdated", (data: any) => {
-    //   setMeeting(data);
-    // });
+    socket.on("meetingUpdated", (data: any) => {
+      setMeeting(data);
+    });
 
     socket.on("noteAdded", (data: Note[]) => {
       setNotes(data);
     });
 
-    // socket.on("actionAdded", (data: Action[]) => {
-    //   setActions(data);
-    // });
+    socket.on("actionAdded", (data: Action[]) => {
+      setActions(data);
+    });
   }, []);
 
   const handleStartMeeting = async () => {

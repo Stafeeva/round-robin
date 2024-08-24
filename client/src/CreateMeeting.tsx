@@ -1,11 +1,15 @@
 import React, { FC } from "react";
-import { Button, Input } from "antd";
+import { Button, Input, Flex } from "antd";
 import { CopyOutlined } from "@ant-design/icons";
-import { Flex } from "antd";
-
-// "/create"
+import { useNavigate } from "react-router-dom";
 
 const CreateMeeting: FC = () => {
+  const navigate = useNavigate();
+
+  const onClickCreateMeeting = () => {
+    navigate("/meeting/123");
+  };
+
   return (
     <Flex
       style={{ width: "100%", height: "100vh" }}
@@ -48,7 +52,11 @@ const CreateMeeting: FC = () => {
             <Button type="default">No</Button>
           </Flex>
         </Flex>
-        <Button type="primary" style={{ marginTop: "48px" }}>
+        <Button
+          type="primary"
+          style={{ marginTop: "48px" }}
+          onClick={onClickCreateMeeting}
+        >
           Create
         </Button>
       </Flex>
