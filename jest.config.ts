@@ -10,6 +10,4 @@ const jestConfig: JestConfigWithTsJest = {
   testMatch: ["**/test/*.test.ts"],
 };
 
-console.log(jestConfig);
-
 export default jestConfig;
