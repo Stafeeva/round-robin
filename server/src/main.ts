@@ -3,6 +3,14 @@ import { createServer } from "http";
 import { Server as SocketIOServer } from "socket.io";
 import { Server } from "./server";
 
+// db dependencies
+import mysql from "mysql";
+import puresql, { PuresqlAdapter } from "puresql";
+
+// domain dependencies
+import * as meeting from "@App/repository/meeting";
+import { Service as MeetingService } from "@App/service/meeting";
+
 const PORT = process.env.PORT || 8000;
 
 const app: express.Application = express();
@@ -18,4 +26,28 @@ httpServer.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);
 });
 
-const roundRobinServer = new Server(app);
+const dbConnection = mysql.createConnection({
+  host: "0.0.0.0",
+  port: 3306,
+  user: "root", // defined in docker-compose.yml
+  password: "password",
+  database: "roundrobin",
+});
+
+const pureSQLAdapter: PuresqlAdapter = puresql.adapters.mysql(
+  dbConnection,
+  () => {}
+);
+
+const pureSQLQueries: Record<
+  string,
+  puresql.PuresqlQuery<any>
+> = puresql.loadQueries("server/src/queries.sql");
+
+const meetingRepository = new meeting.SQLRepository(
+  pureSQLAdapter,
+  pureSQLQueries
+);
+const meetingService = new MeetingService(meetingRepository);
+
+const roundRobinServer = new Server(app, meetingService);
