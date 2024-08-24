@@ -1,0 +1,14 @@
+.note__container {
+  display: flex;
+  align-items: middle;
+  justify-content: space-between;
+}
+
+.note__message {
+  padding-top: 4px;
+}
+
+.note__actions {
+  display: flex;
+  margin-left: 16px;
+}

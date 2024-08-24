@@ -1,0 +1,34 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Join component renders 1`] = `
+<div>
+  <div
+    class="App"
+  >
+    <main>
+      <div
+        class="container"
+      >
+        <div
+          class="join"
+        >
+          <h2>
+            Join
+          </h2>
+          <p>
+            Please enter your name:
+          </p>
+          <form>
+            <input />
+            <button
+              type="submit"
+            >
+              Join
+            </button>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+`;
