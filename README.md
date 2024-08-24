@@ -2,21 +2,29 @@
 
 To run the application, use the following command:
 
-```
+```bash
 npm run dev
+```
+
+## Testing
+
+Run server tests in watch mode
+
+```bash
+npm run test -- --watch
 ```
 
 ## Database
 
 To run the database in a docker container, use the following command:
 
-```
+```bash
 docker-compose up
 ```
 
 To open MariaDB shell:
 
-```
+```bash
 docker-compose exec db mariadb -uroot -ppassword roundrobin
 ```
 
