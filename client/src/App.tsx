@@ -1,6 +1,6 @@
 import React, { FC, useEffect } from "react";
 import { io } from "socket.io-client";
-import { Attendee, Note, Action } from "../../server/server";
+import { Attendee, Note, Action } from "../../server/serverPrototype";
 import { Button, Input } from "antd";
 import "./App.css";
 import Meeting from "./Meeting";

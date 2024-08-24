@@ -7,7 +7,7 @@ import {
   AudioFilled,
 } from "@ant-design/icons";
 
-import { Attendee, Action, Note } from "../../server/server";
+import { Attendee, Action, Note } from "../../server/serverPrototype";
 import "./App.css";
 import { AddAction } from "./App";
 import NoteItem from "./components/Note";
