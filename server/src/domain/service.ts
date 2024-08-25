@@ -28,9 +28,21 @@ export type Speaker = {
   lastName: string;
 };
 
+export type Token = {
+  speakerId: number;
+  token: string;
+};
+
+export type TokenPayload = {
+  speakerUsername: string;
+  speakerId: number;
+};
+
 export interface SpeakerService {
   createSpeaker(spearker: CreateSpeaker): Promise<Speaker>;
   getSpeaker(username: string): Promise<Speaker>;
+  loginSpeaker(username: string, password: string): Promise<Token>;
+  verifyToken(token: string): Promise<TokenPayload>;
 }
 
 const generateMeetingCodeSegment = (length: number): string => {
