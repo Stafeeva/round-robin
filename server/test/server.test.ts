@@ -79,6 +79,12 @@ describe("Server", () => {
     expect(response.text).toBe("Round robin server");
   });
 
+  // progress meeting (move to next speaker / end meeting)
+
+  // delete meeting
+});
+
+describe("GET /api/meeting/", () => {
   it("should return a list of meetings", async () => {
     const response = await request(app).get("/api/meeting");
 
@@ -93,5 +99,117 @@ describe("Server", () => {
     const responseAfterInsert = await request(app).get("/api/meeting");
     expect(responseAfterInsert.status).toBe(200);
     expect(responseAfterInsert.body.length).toBe(1);
+  });
+});
+
+describe("POST /api/meeting", () => {
+  // create meeting
+  it("should create a meeting", async () => {
+    const response = await request(app)
+      .post("/api/meeting")
+      .send({ name: "test meeting" })
+      .expect("Content-Type", /json/)
+      .expect(201);
+
+    const meetingFromAPI = response.body;
+    expect(meetingFromAPI.name).toBe("test meeting");
+
+    // ensure default fields are set
+    expect(meetingFromAPI.autoProceed).toBe(false);
+    expect(meetingFromAPI.speakerDuration).toBe(60);
+
+    // ensure the meeting was saved to the db
+    const meetingFromDb = await meetingRepository.getMeeting(
+      meetingFromAPI.code
+    );
+    expect(meetingFromDb.name).toBe(meetingFromAPI.name);
+  });
+
+  // TODO - test create meeting with invalid input
+  // no name
+
+  it("should return a 400 when no meeting name is provided", async () => {
+    const response = await request(app)
+      .post("/api/meeting")
+      .send({ speakerDuration: 30, autoProceed: false })
+      .expect(400);
+
+    expect(response.status).toBe(400);
+    expect(response.body.error).toBe("Invalid meeting name");
+  });
+
+  it("should return a 400 when the speaker duration is invalid", async () => {
+    const response = await request(app)
+      .post("/api/meeting")
+      .send({ name: "test", speakerDuration: 15, autoProceed: false })
+      .expect(400);
+
+    expect(response.status).toBe(400);
+    expect(response.body.error).toBe(
+      "Invalid speaker duration, must be between 30 and 600 seconds"
+    );
+
+    const responseTooHigh = await request(app)
+      .post("/api/meeting")
+      .send({ name: "test", speakerDuration: 999, autoProceed: false })
+      .expect(400);
+
+    expect(responseTooHigh.status).toBe(400);
+  });
+
+  it("should return a 400 when autoProceed is invalid", async () => {
+    const response = await request(app)
+      .post("/api/meeting")
+      .send({
+        name: "test",
+        speakerDuration: 30,
+        autoProceed: "invalid-not-a-boolean",
+      })
+      .expect(400);
+
+    expect(response.status).toBe(400);
+    expect(response.body.error).toBe(
+      "Invalid autoProceed value, must be a boolean"
+    );
+  });
+});
+
+describe("GET /api/meeting/:code", () => {
+  // get meeting by code
+  it("should return a meeting by code", async () => {
+    // given a meeting exists in the DB
+    const meetingCode = "abc-123-def";
+
+    await meetingRepository.createMeeting({
+      name: "test",
+      speakerDuration: 30,
+      autoProceed: false,
+      code: meetingCode,
+    });
+
+    // when we request the meeting by code
+    const response = await request(app).get(`/api/meeting/${meetingCode}`);
+
+    // then we should get the meeting
+    expect(response.status).toBe(200);
+    expect(response.body.name).toBe("test");
+  });
+
+  it("should return a 404 when the meeting does not exist in the DB", async () => {
+    // when we request a meeting that does not exist
+    const response = await request(app).get("/api/meeting/xyz-123-abc");
+
+    // then we should get a 404
+    expect(response.status).toBe(404);
+  });
+
+  it("should return a 400 when an invalid meeting code is provided", async () => {
+    // when we request a meeting with an invalid code
+    const response = await request(app).get(
+      "/api/meeting/invalid-meeting-code"
+    );
+
+    // then we should get a 400
+    expect(response.status).toBe(400);
   });
 });

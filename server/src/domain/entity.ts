@@ -24,3 +24,7 @@ export type Meeting = {
  */
 
 export class MeetingNotFoundError extends Error {}
+export class InvalidMeetingCodeError extends Error {}
+export class InvalidMeetingNameError extends Error {}
+export class InvalidSpeakerDurationError extends Error {}
+export class InvalidAutoProceedError extends Error {}
