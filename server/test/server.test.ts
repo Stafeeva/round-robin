@@ -14,6 +14,7 @@ import * as service from "@App/domain/service";
 // db dependencies
 import mysql from "mysql";
 import puresql, { PuresqlAdapter } from "puresql";
+import exp from "constants";
 
 const PORT = process.env.PORT || 9999;
 
@@ -263,7 +264,7 @@ describe("POST /api/speaker", () => {
     expect(isMatchingPassword).toBe(true);
   });
 
-  // TODO
+  // TODO some tests should be unit tests closer to implementation
   // create speaker with invalid username
   // create speaker with invalid password
   // create speaker with invalid first name
@@ -271,9 +272,38 @@ describe("POST /api/speaker", () => {
   // create speaker with existing username
 
   // TODO
-  // get speaker by username
+  // get speaker by username / id ? is this needed?
 
   // TODO
   // speaker login
   // need some form of token?
+});
+
+describe("POST /api/speaker:login", () => {
+  it("logs in a speaker", async () => {
+    // create a speaker
+    const speaker = await speakerService.createSpeaker({
+      username: "test-speaker",
+      password: "password",
+      firstName: "Test",
+      lastName: "Speaker",
+    });
+
+    const response = await request(app)
+      .post("/api/speaker:login")
+      .send({
+        username: "test-speaker",
+        password: "password",
+      })
+      .expect("Content-Type", /json/)
+      .expect(200);
+
+    // expect a token to be returned
+    const token = response.body.token;
+
+    // verify the token is valid
+    const tokenPayload = await speakerService.verifyToken(token);
+    expect(tokenPayload.speakerUsername).toBe("test-speaker");
+    expect(tokenPayload.speakerId).toBe(1);
+  });
 });
