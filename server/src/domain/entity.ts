@@ -18,3 +18,9 @@ export type Meeting = {
   createdAt: Date;
   speakerQueue: number[];
 };
+
+/**
+ * Errors
+ */
+
+export class MeetingNotFoundError extends Error {}

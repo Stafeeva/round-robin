@@ -52,20 +52,17 @@ const meetingService = new MeetingService(meetingRepository);
 const roundRobinServer = new Server(app, meetingService);
 
 beforeAll(() => {
-  httpServer.listen(PORT, () => {
-    console.log(`Server listening on ${PORT}`);
-  });
+  httpServer.listen(PORT, () => {});
 });
 
 afterAll(() => {
   httpServer.close();
+  dbConnection.end();
 });
 
 // TODO - clean the DB before each test
 
 beforeEach(() => {
-  console.log("before each");
-
   // clean the DB
   dbConnection.query("SET FOREIGN_KEY_CHECKS = 0");
   dbConnection.query("TRUNCATE TABLE meeting");
