@@ -11,7 +11,7 @@
     "server": "nodemon --verbose --watch \"server\" --ext \"ts,json\" --exec ts-node server/src/main.ts",
     "client": "cd client && npm start && cd ..",
     "dev": "concurrently \"npm run client\" \"npm run server\"",
-    "test": "jest -c jest.config.ts"
+    "test": "jest -c jest.config.ts --runInBand"
   },
   "keywords": [],
   "author": "",
