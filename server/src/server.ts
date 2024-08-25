@@ -15,7 +15,8 @@ export class Server {
 
   constructor(
     express: express.Application,
-    meetingService: service.MeetingService
+    meetingService: service.MeetingService,
+    speakerService: service.SpeakerService
   ) {
     this.app = express;
     // Map http routes to the service methods
@@ -63,6 +64,16 @@ export class Server {
         } else {
           res.status(500).json({ error: "Server error" });
         }
+      }
+    });
+
+    this.app.post("/api/speaker", async (req, res) => {
+      try {
+        const newSpeaker = await speakerService.createSpeaker(req.body);
+        res.status(201).json(newSpeaker);
+      } catch (error) {
+        console.log("Server error", error);
+        res.status(500).json({ error: "Server error" });
       }
     });
   }

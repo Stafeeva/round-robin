@@ -8,3 +8,11 @@ export type Meeting = {
   state: string;
   speaker_queue: string;
 };
+
+export type Speaker = {
+  id: number;
+  username: string;
+  password: string;
+  first_name: string;
+  last_name: string;
+};
