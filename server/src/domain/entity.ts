@@ -19,6 +19,14 @@ export type Meeting = {
   speakerQueue: number[];
 };
 
+export type Speaker = {
+  id: number;
+  username: string;
+  password: string; // a hashed password
+  firstName: string;
+  lastName: string;
+};
+
 /**
  * Errors
  */

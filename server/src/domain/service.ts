@@ -1,5 +1,7 @@
 import * as entity from "@App/domain/entity";
 
+import bcrypt from "bcrypt";
+
 export type CreateMeeting = {
   name: string;
   speakerDuration?: number;
@@ -10,6 +12,25 @@ export interface MeetingService {
   listMeetings(): Promise<entity.Meeting[]>;
   createMeeting(meeting: CreateMeeting): Promise<entity.Meeting>;
   getMeeting(code: string): Promise<entity.Meeting>;
+}
+
+export type CreateSpeaker = {
+  username: string;
+  password: string; // unhashed password
+  firstName: string;
+  lastName: string;
+};
+
+export type Speaker = {
+  id: number;
+  username: string;
+  firstName: string;
+  lastName: string;
+};
+
+export interface SpeakerService {
+  createSpeaker(spearker: CreateSpeaker): Promise<Speaker>;
+  getSpeaker(username: string): Promise<Speaker>;
 }
 
 const generateMeetingCodeSegment = (length: number): string => {
@@ -36,4 +57,30 @@ export const randomMeetingCodeGenerator: MeetingCodeGenerator = (): string => {
 
 export const isValidMeetingCode = (code: string): boolean => {
   return /^[a-z0-9]{3}-[a-z0-9]{3}-[a-z0-9]{3}$/.test(code);
+};
+
+// hash a password
+export const hashPassword = async (password: string): Promise<string> => {
+  // hash using bcrypt
+  const saltRounds = 5;
+
+  try {
+    const hash = await bcrypt.hash(password, saltRounds);
+    return hash;
+  } catch (error) {
+    console.error("Error hashing password", error);
+    throw new Error("Error hashing password");
+  }
+};
+
+export const comparePasswords = async (
+  password: string,
+  hashedPassword: string
+): Promise<boolean> => {
+  try {
+    return await bcrypt.compare(password, hashedPassword);
+  } catch (error) {
+    console.error("Error comparing passwords", error);
+    throw new Error("Error comparing passwords");
+  }
 };

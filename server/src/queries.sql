@@ -21,3 +21,13 @@ LIMIT 1
 UPDATE meeting
 SET state = :state, speaker_queue = :speaker_queue
 WHERE code = :code
+
+-- name: get_speaker
+SELECT *
+FROM speaker
+WHERE username = :username
+LIMIT 1
+
+-- name: create_speaker
+INSERT INTO speaker (username, password, first_name, last_name)
+VALUES (:username, :password, :first_name, :last_name)

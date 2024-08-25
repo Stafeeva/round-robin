@@ -6,7 +6,10 @@ import { createServer } from "http";
 import { Server as SocketIOServer } from "socket.io";
 import { Server } from "../src/server";
 import * as meeting from "@App/repository/meeting";
+import * as speaker from "@App/repository/speaker";
 import { Service as MeetingService } from "@App/service/meeting";
+import { Service as SpeakerService } from "@App/service/speaker";
+import * as service from "@App/domain/service";
 
 // db dependencies
 import mysql from "mysql";
@@ -47,9 +50,16 @@ const meetingRepository = new meeting.SQLRepository(
   pureSQLAdapter,
   pureSQLQueries
 );
-const meetingService = new MeetingService(meetingRepository);
 
-const roundRobinServer = new Server(app, meetingService);
+const speakerRepository = new speaker.SQLRepository(
+  pureSQLAdapter,
+  pureSQLQueries
+);
+
+const meetingService = new MeetingService(meetingRepository);
+const speakerService = new SpeakerService(speakerRepository);
+
+const roundRobinServer = new Server(app, meetingService, speakerService);
 
 beforeAll(() => {
   httpServer.listen(PORT, () => {});
@@ -124,9 +134,6 @@ describe("POST /api/meeting", () => {
     );
     expect(meetingFromDb.name).toBe(meetingFromAPI.name);
   });
-
-  // TODO - test create meeting with invalid input
-  // no name
 
   it("should return a 400 when no meeting name is provided", async () => {
     const response = await request(app)
@@ -212,4 +219,61 @@ describe("GET /api/meeting/:code", () => {
     // then we should get a 400
     expect(response.status).toBe(400);
   });
+});
+
+describe("POST /api/speaker", () => {
+  it("creates a speaker", async () => {
+    const response = await request(app)
+      .post("/api/speaker")
+      .send({
+        username: "test-speaker",
+        password: "password",
+        firstName: "Test",
+        lastName: "Speaker",
+      })
+      .expect("Content-Type", /json/)
+      .expect(201);
+
+    const speakerFromAPI = response.body;
+
+    expect(speakerFromAPI.id).toBe(1);
+    expect(speakerFromAPI.username).toBe("test-speaker");
+    expect(speakerFromAPI.firstName).toBe("Test");
+    expect(speakerFromAPI.lastName).toBe("Speaker");
+
+    // password field should not exist on the response
+    expect(speakerFromAPI.password).toBeUndefined();
+
+    // ensure the speaker was saved to the db
+    // ensure the password is hashed
+
+    const speakerFromDb = await speakerRepository.getSpeaker(
+      speakerFromAPI.username
+    );
+
+    expect(speakerFromDb.id).toBe(1);
+    expect(speakerFromDb.username).toBe("test-speaker");
+    expect(speakerFromDb.password).not.toBe("password");
+
+    // check the hashed password
+    const isMatchingPassword = await service.comparePasswords(
+      "password",
+      speakerFromDb.password
+    );
+    expect(isMatchingPassword).toBe(true);
+  });
+
+  // TODO
+  // create speaker with invalid username
+  // create speaker with invalid password
+  // create speaker with invalid first name
+  // create speaker with invalid last name
+  // create speaker with existing username
+
+  // TODO
+  // get speaker by username
+
+  // TODO
+  // speaker login
+  // need some form of token?
 });

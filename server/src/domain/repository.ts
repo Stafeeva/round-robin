@@ -22,3 +22,15 @@ export interface MeetingRepository {
     speakerQueue: number[]
   ): Promise<entity.Meeting>;
 }
+
+export type CreateSpeaker = {
+  username: string;
+  password: string; // hashed password
+  firstName: string;
+  lastName: string;
+};
+
+export interface SpeakerRepository {
+  createSpeaker(speaker: CreateSpeaker): Promise<entity.Speaker>;
+  getSpeaker(username: string): Promise<entity.Speaker>;
+}

@@ -10,6 +10,8 @@ import puresql, { PuresqlAdapter } from "puresql";
 // domain dependencies
 import * as meeting from "@App/repository/meeting";
 import { Service as MeetingService } from "@App/service/meeting";
+import * as speaker from "@App/repository/speaker";
+import { Service as SpeakerService } from "@App/service/speaker";
 
 const PORT = process.env.PORT || 8000;
 
@@ -48,6 +50,13 @@ const meetingRepository = new meeting.SQLRepository(
   pureSQLAdapter,
   pureSQLQueries
 );
-const meetingService = new MeetingService(meetingRepository);
 
-const roundRobinServer = new Server(app, meetingService);
+const speakerRepository = new speaker.SQLRepository(
+  pureSQLAdapter,
+  pureSQLQueries
+);
+
+const meetingService = new MeetingService(meetingRepository);
+const speakerService = new SpeakerService(speakerRepository);
+
+const roundRobinServer = new Server(app, meetingService, speakerService);
