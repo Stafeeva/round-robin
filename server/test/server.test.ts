@@ -273,16 +273,12 @@ describe("POST /api/speaker", () => {
 
   // TODO
   // get speaker by username / id ? is this needed?
-
-  // TODO
-  // speaker login
-  // need some form of token?
 });
 
 describe("POST /api/speaker:login", () => {
   it("logs in a speaker", async () => {
     // create a speaker
-    const speaker = await speakerService.createSpeaker({
+    await speakerService.createSpeaker({
       username: "test-speaker",
       password: "password",
       firstName: "Test",
@@ -306,4 +302,23 @@ describe("POST /api/speaker:login", () => {
     expect(tokenPayload.speakerUsername).toBe("test-speaker");
     expect(tokenPayload.speakerId).toBe(1);
   });
+
+  it("returns a 401 when the password is incorrect", async () => {
+    // create a speaker
+    await speakerService.createSpeaker({
+      username: "test-speaker",
+      password: "password",
+      firstName: "Test",
+      lastName: "Speaker",
+    });
+    // send wrong credentials
+    const response = await request(app).post("/api/speaker:login").send({
+      username: "test-speaker",
+      password: "wrong-password",
+    });
+
+    expect(response.status).toBe(401);
+  });
+
+  // TODO - try to log in with a username that does not exist - 401?
 });

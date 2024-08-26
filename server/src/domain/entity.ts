@@ -36,3 +36,5 @@ export class InvalidMeetingCodeError extends Error {}
 export class InvalidMeetingNameError extends Error {}
 export class InvalidSpeakerDurationError extends Error {}
 export class InvalidAutoProceedError extends Error {}
+export class InvalidPasswordError extends Error {}
+export class InvalidTokenError extends Error {}

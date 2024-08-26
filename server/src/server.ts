@@ -78,17 +78,18 @@ export class Server {
     });
 
     this.app.post("/api/speaker[:]login", async (req, res) => {
-      console.log("login...");
       const username = req.body.username;
       const password = req.body.password;
 
       try {
-        console.log("trying to login speaker", username);
         const speaker = await speakerService.loginSpeaker(username, password);
         res.status(200).json(speaker);
       } catch (error) {
-        console.log("Server error", error);
-        res.status(500).json({ error: "Server error" });
+        if (error instanceof entity.InvalidPasswordError) {
+          res.status(401).json({ error: "Invalid password" });
+        } else {
+          res.status(500).json({ error: "Server error" });
+        }
       }
     });
   }
