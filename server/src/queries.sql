@@ -31,3 +31,14 @@ LIMIT 1
 -- name: create_speaker
 INSERT INTO speaker (username, password, first_name, last_name)
 VALUES (:username, :password, :first_name, :last_name)
+
+-- name: get_meeting_speakers
+SELECT s.*
+FROM speaker s, meeting m, meeting_speaker ms
+WHERE m.code = :code 
+AND m.id = ms.meeting_id
+AND s.id = ms.speaker_id
+
+-- name: add_speaker_to_meeting
+INSERT INTO meeting_speaker (meeting_id, speaker_id)
+VALUES (:meeting_id, :speaker_id)
