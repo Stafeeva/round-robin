@@ -2,6 +2,7 @@ import express from "express";
 
 import request from "supertest";
 
+import * as entity from "@App/domain/entity";
 import { createServer } from "http";
 import { Server as SocketIOServer } from "socket.io";
 import { Server } from "../src/server";
@@ -351,5 +352,121 @@ describe("POST /api/meeting/:code/speaker", () => {
     const speakers = await meetingRepository.getSpeakers(meeting.code);
     expect(speakers.length).toBe(1);
     expect(speakers[0].id).toBe(speaker.id);
+  });
+});
+
+describe("POST /api/meeting/:code[:]start", () => {
+  it("starts a meeting", async () => {
+    // create a meeting
+    const meeting = await meetingService.createMeeting({
+      name: "test-meeting",
+      speakerDuration: 30,
+      autoProceed: false,
+    });
+
+    // add a speaker to the meeting
+    const speakerOne = await speakerService.createSpeaker({
+      username: "test-speaker-one",
+      password: "password",
+      firstName: "Test",
+      lastName: "Speaker",
+    });
+
+    // add a second speaker to the meeting
+    const speakerTwo = await speakerService.createSpeaker({
+      username: "test-speaker-two",
+      password: "password",
+      firstName: "Test",
+      lastName: "Speaker",
+    });
+
+    await meetingService.addSpeakerToMeeting(meeting.code, speakerOne.id);
+    await meetingService.addSpeakerToMeeting(meeting.code, speakerTwo.id);
+
+    // start the meeting
+    const response = await request(app)
+      .post(`/api/meeting/${meeting.code}:start`)
+      .send({})
+      .expect(200);
+    expect(response.body.state).toBe(entity.MeetingState.InProgress);
+
+    // expect the meeting to be in progress
+    const meetingAfterStart = await meetingRepository.getMeeting(meeting.code);
+    expect(meetingAfterStart.state).toBe(entity.MeetingState.InProgress);
+
+    // verify speaker queue
+    expect(meetingAfterStart.speakerQueue).toEqual(
+      expect.arrayContaining([speakerOne.id, speakerTwo.id])
+    );
+  });
+});
+
+describe("POST /api/meeting/:code[:]next", () => {
+  it("moves to the next speaker", async () => {
+    // create a meeting
+    const meeting = await meetingService.createMeeting({
+      name: "test-meeting",
+      speakerDuration: 30,
+      autoProceed: false,
+    });
+
+    // add a speaker to the meeting
+    const speakerOne = await speakerService.createSpeaker({
+      username: "test-speaker-one",
+      password: "password",
+      firstName: "Test",
+      lastName: "Speaker",
+    });
+
+    // add a second speaker to the meeting
+    const speakerTwo = await speakerService.createSpeaker({
+      username: "test-speaker-two",
+      password: "password",
+      firstName: "Test",
+      lastName: "Speaker",
+    });
+
+    // add a third speaker to the meeting
+    const speakerThree = await speakerService.createSpeaker({
+      username: "test-speaker-three",
+      password: "password",
+      firstName: "Test",
+      lastName: "Speaker",
+    });
+
+    await meetingService.addSpeakerToMeeting(meeting.code, speakerOne.id);
+    await meetingService.addSpeakerToMeeting(meeting.code, speakerTwo.id);
+    await meetingService.addSpeakerToMeeting(meeting.code, speakerThree.id);
+
+    // start the meeting
+    const response = await request(app)
+      .post(`/api/meeting/${meeting.code}:start`)
+      .send({})
+      .expect(200);
+    expect(response.body.state).toBe(entity.MeetingState.InProgress);
+
+    const speakerQueue = response.body.speakerQueue;
+
+    // move to the next speaker
+    expect(
+      (await request(app).post(`/api/meeting/${meeting.code}:next`).expect(200))
+        .body.speakerQueue
+    ).toEqual(speakerQueue.slice(1));
+
+    // move to the next speaker
+    expect(
+      (await request(app).post(`/api/meeting/${meeting.code}:next`).expect(200))
+        .body.speakerQueue
+    ).toEqual(speakerQueue.slice(2));
+
+    // move to the last speaker
+    const finalMeetingResponse = await request(app)
+      .post(`/api/meeting/${meeting.code}:next`)
+      .expect(200);
+
+    // meeting has ended
+    const finalMeeting = finalMeetingResponse.body;
+    expect(finalMeeting.speakerQueue).toEqual(speakerQueue.slice(3));
+    expect(finalMeeting.state).toBe(entity.MeetingState.Ended);
   });
 });

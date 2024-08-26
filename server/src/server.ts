@@ -105,5 +105,26 @@ export class Server {
         res.status(500).json({ error: "Server error" });
       }
     });
+
+    this.app.post("/api/meeting/:code[:]start", async (req, res) => {
+      // @ts-ignore
+      const meetingCode = req.params.code;
+
+      try {
+        const meeting = await meetingService.startMeeting(meetingCode);
+
+        res.status(200).json(meeting);
+      } catch (error) {
+        console.error("Error starting meeting", error);
+        res.status(500).json({ error: "Server error" });
+      }
+    });
+
+    this.app.post("/api/meeting/:code[:]next", async (req, res) => {
+      // @ts-ignore
+      const meeting = await meetingService.moveToNextSpeaker(req.params.code);
+
+      res.status(200).json(meeting);
+    });
   }
 }
