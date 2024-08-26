@@ -16,6 +16,8 @@ export interface MeetingService {
     meetingCode: string,
     speakerId: number
   ): Promise<entity.Meeting>;
+  startMeeting(code: string): Promise<entity.Meeting>;
+  moveToNextSpeaker(code: string): Promise<entity.Meeting>;
 }
 
 export type CreateSpeaker = {
@@ -99,4 +101,12 @@ export const comparePasswords = async (
     console.error("Error comparing passwords", error);
     throw new Error("Error comparing passwords");
   }
+};
+
+export const shuffleArray = <T>(array: T[]): T[] => {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
 };

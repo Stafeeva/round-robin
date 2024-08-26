@@ -72,4 +72,46 @@ export class Service implements MeetingService {
 
     return meeting;
   }
+
+  async startMeeting(code: string): Promise<entity.Meeting> {
+    const meeting = await this.meetingRepository.getMeeting(code);
+
+    const speakerQueue = service
+      .shuffleArray(await this.meetingRepository.getSpeakers(code))
+      .map((speaker) => speaker.id);
+
+    // start the meeting
+    const updatedMeeting = await this.meetingRepository.updateMeetingState(
+      entity.MeetingState.InProgress,
+      code,
+      speakerQueue
+    );
+
+    return updatedMeeting;
+  }
+
+  async moveToNextSpeaker(code: string): Promise<entity.Meeting> {
+    const meeting = await this.meetingRepository.getMeeting(code);
+
+    // TODO - what should this do if meeting has already ended? 409 Conflict?
+    // https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/409
+
+    // remove the first speaker from the queue
+    const speakerQueue = meeting.speakerQueue.slice(1);
+
+    const nextMeetingState =
+      speakerQueue.length === 0
+        ? entity.MeetingState.Ended
+        : entity.MeetingState.InProgress;
+
+    // update the meeting with the new speaker queue
+    const updatedMeeting = await this.meetingRepository.updateMeetingState(
+      nextMeetingState,
+      code,
+      speakerQueue
+    );
+
+    // return the updated meeting
+    return updatedMeeting;
+  }
 }
