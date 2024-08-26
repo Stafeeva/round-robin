@@ -47,8 +47,7 @@ export class Service implements SpeakerService {
     );
 
     if (!isPasswordCorrect) {
-      // TODO replace with entity error
-      throw new Error("Invalid password");
+      throw new entity.InvalidPasswordError();
     }
 
     // generate a token
@@ -75,9 +74,7 @@ export class Service implements SpeakerService {
       const { speakerId, speakerUsername } = tokenPayload;
       return { speakerId, speakerUsername };
     } catch (error) {
-      // TODO - replace with custom error
-      console.error("Error verifying token", error);
-      throw new Error("Error verifying token");
+      throw new entity.InvalidTokenError();
     }
   }
 }
