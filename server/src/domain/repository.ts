@@ -21,6 +21,8 @@ export interface MeetingRepository {
     code: string,
     speakerQueue: number[]
   ): Promise<entity.Meeting>;
+  getSpeakers(meetingCode: string): Promise<entity.Speaker[]>;
+  addSpeakerToMeeting(meetingId: number, speakerId: number): Promise<void>;
 }
 
 export type CreateSpeaker = {

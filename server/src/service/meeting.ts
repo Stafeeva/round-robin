@@ -57,4 +57,19 @@ export class Service implements MeetingService {
       throw new entity.InvalidMeetingCodeError();
     }
   }
+
+  async addSpeakerToMeeting(
+    meetingCode: string,
+    speakerId: number
+  ): Promise<entity.Meeting> {
+    // TODO meeting must exist
+    // TODO speaker must exist
+
+    const meeting = await this.meetingRepository.getMeeting(meetingCode);
+
+    // add the speaker to the meeting
+    await this.meetingRepository.addSpeakerToMeeting(meeting.id, speakerId);
+
+    return meeting;
+  }
 }

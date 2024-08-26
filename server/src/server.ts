@@ -92,5 +92,18 @@ export class Server {
         }
       }
     });
+
+    this.app.post("/api/meeting/:code/speaker", async (req, res) => {
+      try {
+        await meetingService.addSpeakerToMeeting(
+          req.params.code,
+          req.body.speakerId
+        );
+        res.status(201).json({ message: "Speaker added to meeting" });
+      } catch (error) {
+        console.error("Error adding speaker to meeting", error);
+        res.status(500).json({ error: "Server error" });
+      }
+    });
   }
 }

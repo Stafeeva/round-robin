@@ -3,7 +3,9 @@ import * as entity from "@App/domain/entity";
 import * as db from "@App/domain/db";
 import { CreateSpeaker, SpeakerRepository } from "@App/domain/repository";
 
-const dbSpeakerToEntitySpeaker = (speaker: db.Speaker): entity.Speaker => {
+export const dbSpeakerToEntitySpeaker = (
+  speaker: db.Speaker
+): entity.Speaker => {
   return {
     id: speaker.id,
     username: speaker.username,

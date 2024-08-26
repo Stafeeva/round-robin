@@ -2,6 +2,7 @@ import puresql, { PuresqlAdapter } from "puresql";
 import * as entity from "@App/domain/entity";
 import * as db from "@App/domain/db";
 import { CreateMeeting, MeetingRepository } from "@App/domain/repository";
+import { dbSpeakerToEntitySpeaker } from "./speaker";
 
 const dbMeetingToEntityMeeting = (meeting: db.Meeting): entity.Meeting => {
   return {
@@ -78,5 +79,25 @@ export class SQLRepository implements MeetingRepository {
     };
     await this.queries.update_meeting_state(queryData, this.adapter);
     return this.getMeeting(code);
+  }
+
+  async getSpeakers(meetingCode: string): Promise<entity.Speaker[]> {
+    const speakers = await this.queries.get_meeting_speakers(
+      { code: meetingCode },
+      this.adapter
+    );
+
+    return speakers.map(dbSpeakerToEntitySpeaker);
+  }
+
+  async addSpeakerToMeeting(
+    meetingId: number,
+    speakerId: number
+  ): Promise<void> {
+    await this.queries.add_speaker_to_meeting(
+      { meeting_id: meetingId, speaker_id: speakerId },
+      this.adapter
+    );
+    return;
   }
 }

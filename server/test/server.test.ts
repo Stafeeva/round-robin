@@ -322,3 +322,34 @@ describe("POST /api/speaker:login", () => {
 
   // TODO - try to log in with a username that does not exist - 401?
 });
+
+describe("POST /api/meeting/:code/speaker", () => {
+  it("adds a speaker to a meeting", async () => {
+    // create a meeting
+    const meeting = await meetingService.createMeeting({
+      name: "test",
+      speakerDuration: 30,
+      autoProceed: false,
+    });
+
+    // create a speaker
+    const speaker = await speakerService.createSpeaker({
+      username: "test-speaker",
+      password: "password",
+      firstName: "Test",
+      lastName: "Speaker",
+    });
+
+    // add the speaker to the meeting
+    const response = await request(app)
+      .post(`/api/meeting/${meeting.code}/speaker`)
+      .send({ speakerId: speaker.id })
+      .send({})
+      .expect(201);
+
+    // expect the speaker to be added to the meeting
+    const speakers = await meetingRepository.getSpeakers(meeting.code);
+    expect(speakers.length).toBe(1);
+    expect(speakers[0].id).toBe(speaker.id);
+  });
+});
