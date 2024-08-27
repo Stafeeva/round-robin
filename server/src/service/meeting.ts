@@ -1,14 +1,19 @@
 import * as service from "@App/domain/service";
-import { MeetingService } from "@App/domain/service";
+import { NotificationService, MeetingService } from "@App/domain/service";
 import { MeetingRepository } from "@App/domain/repository";
 import * as repository from "@App/domain/repository";
 import * as entity from "@App/domain/entity";
 
 export class Service implements MeetingService {
   private meetingRepository: MeetingRepository;
+  private notificationService: NotificationService;
 
-  constructor(meetingRepository: MeetingRepository) {
+  constructor(
+    meetingRepository: MeetingRepository,
+    notificationService: NotificationService
+  ) {
     this.meetingRepository = meetingRepository;
+    this.notificationService = notificationService;
   }
 
   async listMeetings() {
@@ -87,6 +92,8 @@ export class Service implements MeetingService {
       speakerQueue
     );
 
+    this.notificationService.notify(updatedMeeting);
+
     return updatedMeeting;
   }
 
@@ -111,6 +118,7 @@ export class Service implements MeetingService {
       speakerQueue
     );
 
+    this.notificationService.notify(updatedMeeting);
     // return the updated meeting
     return updatedMeeting;
   }

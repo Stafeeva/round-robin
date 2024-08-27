@@ -13,7 +13,7 @@ const PORT = process.env.PORT || 8000;
 
 const app = express();
 const server = createServer(app);
-const io = new Server(server);
+const io: Server = new Server(server);
 
 app.use(express.json());
 // Serve the React static files after build

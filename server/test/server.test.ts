@@ -12,6 +12,10 @@ import { Service as MeetingService } from "@App/service/meeting";
 import { Service as SpeakerService } from "@App/service/speaker";
 import * as service from "@App/domain/service";
 
+import { Service as NotificationService } from "@App/service/notification";
+
+import { io } from "socket.io-client";
+
 // db dependencies
 import mysql from "mysql";
 import puresql, { PuresqlAdapter } from "puresql";
@@ -22,7 +26,7 @@ const PORT = process.env.PORT || 9999;
 const app: express.Application = express();
 
 const httpServer = createServer(app);
-const io: SocketIOServer = new SocketIOServer(httpServer);
+const socketIOServer: SocketIOServer = new SocketIOServer(httpServer);
 
 app.use(express.json());
 // Serve the React static files after build
@@ -58,10 +62,18 @@ const speakerRepository = new speaker.SQLRepository(
   pureSQLQueries
 );
 
-const meetingService = new MeetingService(meetingRepository);
+const notificationService = new NotificationService(socketIOServer);
+
+const meetingService = new MeetingService(
+  meetingRepository,
+  notificationService
+);
 const speakerService = new SpeakerService(speakerRepository);
 
 const roundRobinServer = new Server(app, meetingService, speakerService);
+
+// setup socket io client
+const socket = io(`http://localhost:${PORT}`);
 
 beforeAll(() => {
   httpServer.listen(PORT, () => {});
@@ -70,9 +82,8 @@ beforeAll(() => {
 afterAll(() => {
   httpServer.close();
   dbConnection.end();
+  socket.close();
 });
-
-// TODO - clean the DB before each test
 
 beforeEach(() => {
   // clean the DB
@@ -82,6 +93,27 @@ beforeEach(() => {
   dbConnection.query("TRUNCATE TABLE meeting_speaker");
   dbConnection.query("SET FOREIGN_KEY_CHECKS = 1");
 });
+
+// Define a helper function to wait for a condition to become true within a timeout
+const waitForCondition = async (
+  conditionFn: () => boolean,
+  timeoutMs = 1000,
+  intervalMs = 100
+) => {
+  const startTime = Date.now();
+  return new Promise((resolve, reject) => {
+    const checkCondition = async () => {
+      if (await conditionFn()) {
+        resolve(true);
+      } else if (Date.now() - startTime > timeoutMs) {
+        reject(new Error("Timeout waiting for condition"));
+      } else {
+        setTimeout(checkCondition, intervalMs);
+      }
+    };
+    checkCondition();
+  });
+};
 
 describe("Server", () => {
   it("should respond on `/`", async () => {
@@ -401,13 +433,21 @@ describe("POST /api/meeting/:code[:]start", () => {
   });
 });
 
-describe("POST /api/meeting/:code[:]next", () => {
+describe("POST /api/meeting/:code[:]next WIP", () => {
   it("moves to the next speaker", async () => {
+    let webSocketMeetingUpdates: entity.Meeting[] = [];
+
     // create a meeting
     const meeting = await meetingService.createMeeting({
       name: "test-meeting",
       speakerDuration: 30,
       autoProceed: false,
+    });
+
+    socket.emit("joinRoom", meeting.code);
+
+    socket.on("meetingUpdated", (meeting: entity.Meeting) => {
+      webSocketMeetingUpdates.push(meeting);
     });
 
     // add a speaker to the meeting
@@ -434,6 +474,9 @@ describe("POST /api/meeting/:code[:]next", () => {
       lastName: "Speaker",
     });
 
+    // no web socket updates yet
+    expect(webSocketMeetingUpdates.length).toBe(0);
+
     await meetingService.addSpeakerToMeeting(meeting.code, speakerOne.id);
     await meetingService.addSpeakerToMeeting(meeting.code, speakerTwo.id);
     await meetingService.addSpeakerToMeeting(meeting.code, speakerThree.id);
@@ -447,17 +490,28 @@ describe("POST /api/meeting/:code[:]next", () => {
 
     const speakerQueue = response.body.speakerQueue;
 
+    waitForCondition(() => {
+      return (
+        webSocketMeetingUpdates.length === 1 &&
+        webSocketMeetingUpdates[0].state === entity.MeetingState.InProgress
+      );
+    });
+
     // move to the next speaker
     expect(
       (await request(app).post(`/api/meeting/${meeting.code}:next`).expect(200))
         .body.speakerQueue
     ).toEqual(speakerQueue.slice(1));
 
+    waitForCondition(() => webSocketMeetingUpdates.length === 2);
+
     // move to the next speaker
     expect(
       (await request(app).post(`/api/meeting/${meeting.code}:next`).expect(200))
         .body.speakerQueue
     ).toEqual(speakerQueue.slice(2));
+
+    waitForCondition(() => webSocketMeetingUpdates.length === 3);
 
     // move to the last speaker
     const finalMeetingResponse = await request(app)
