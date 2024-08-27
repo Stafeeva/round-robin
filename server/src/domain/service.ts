@@ -20,6 +20,10 @@ export interface MeetingService {
   moveToNextSpeaker(code: string): Promise<entity.Meeting>;
 }
 
+export interface NotificationService {
+  notify(meeting: entity.Meeting): Promise<void>;
+}
+
 export type CreateSpeaker = {
   username: string;
   password: string; // unhashed password
