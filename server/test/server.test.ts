@@ -19,7 +19,6 @@ import { io } from "socket.io-client";
 // db dependencies
 import mysql from "mysql";
 import puresql, { PuresqlAdapter } from "puresql";
-import exp from "constants";
 
 const PORT = process.env.PORT || 9999;
 

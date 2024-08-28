@@ -6,11 +6,21 @@ import Main from "./Main";
 import Home from "./Home";
 import CreateMeeting from "./CreateMeeting";
 import Meeting from "./Meeting";
+import Login from "./Login";
+import CreateAccount from "./CreateAccount";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Home />,
+  },
+  {
+    path: "/login",
+    element: <Login />,
+  },
+  {
+    path: "/create-account",
+    element: <CreateAccount />,
   },
   {
     path: "/join",
