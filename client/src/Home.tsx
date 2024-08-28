@@ -1,9 +1,37 @@
-import React, { FC } from "react";
+import React, { FC, useEffect } from "react";
 import { Button } from "antd";
 import { Flex } from "antd";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Home: FC = () => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // get token from local storage
+    const token = localStorage.getItem("token");
+
+    console.log("token", token);
+    // if token exist, redirect to login page
+    if (token === null) {
+      navigate("/login");
+    }
+
+    const parsedToken = JSON.parse(token as string);
+    console.log("parsedToken", parsedToken);
+
+    // fetch list of meetings from api
+    fetch("/api/meeting", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${parsedToken.token}`,
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("data", data);
+      });
+  }, []);
+
   return (
     <Flex
       style={{ width: "100%", height: "100vh" }}

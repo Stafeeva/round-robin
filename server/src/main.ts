@@ -2,6 +2,7 @@ import express from "express";
 import { createServer } from "http";
 import { Server as SocketIOServer } from "socket.io";
 import { Server } from "./server";
+import { Service as NotificationService } from "@App/service/notification";
 
 // db dependencies
 import mysql from "mysql";
@@ -56,7 +57,12 @@ const speakerRepository = new speaker.SQLRepository(
   pureSQLQueries
 );
 
-const meetingService = new MeetingService(meetingRepository);
+const notificationService = new NotificationService(io);
+
+const meetingService = new MeetingService(
+  meetingRepository,
+  notificationService
+);
 const speakerService = new SpeakerService(speakerRepository);
 
 const roundRobinServer = new Server(app, meetingService, speakerService);
