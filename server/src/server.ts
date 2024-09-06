@@ -24,31 +24,31 @@ export class Server {
       res.send("Round robin server");
     });
 
+    const unauthorizedRoutes = ["/api/speaker", "/api/speaker:login"];
     const authMiddleware = async (
       req: express.Request,
       res: express.Response,
       next: express.NextFunction
     ) => {
+      if (unauthorizedRoutes.includes(req.path)) {
+        return next();
+      }
+
       if (req.headers.authorization) {
         const token = req.headers.authorization.replace("Bearer ", "");
-        const verified = await speakerService.verifyToken(token);
 
-        if (verified) {
-          console.log("verified speaker", verified);
-          next();
-        } else {
-          console.error("unauthorized");
-          next();
-
-          // TODO handle unauthorized
-          //res.status(401).json({ error: "Unauthorized" });
+        try {
+          const verified = await speakerService.verifyToken(token);
+          return next();
+        } catch (error) {
+          if (error instanceof entity.InvalidTokenError) {
+            res.status(401).json({ error: "Unauthorized" });
+          } else {
+            res.status(500).json({ error: "Server error" });
+          }
         }
       } else {
-        //res.status(401).json({ error: "Unauthorized" });
-
-        console.error("no auth header");
-        next();
-        // TODO handle no auth header
+        res.status(401).json({ error: "Unauthorized" });
       }
     };
 
