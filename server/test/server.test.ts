@@ -127,9 +127,35 @@ describe("Server", () => {
   // delete meeting
 });
 
+const setUpLoggedInSpeaker = async () => {
+  const speaker = await speakerService.createSpeaker({
+    username: "logged-in-speaker",
+    password: "password",
+    firstName: "Test",
+    lastName: "Speaker",
+  });
+
+  const response = await request(app)
+    .post("/api/speaker:login")
+    .send({
+      username: "logged-in-speaker",
+      password: "password",
+    })
+    .expect("Content-Type", /json/)
+    .expect(200);
+
+  // expect a token to be returned
+  const token = response.body.token;
+  return { speaker, token };
+};
+
 describe("GET /api/meeting/", () => {
   it("should return a list of meetings", async () => {
-    const response = await request(app).get("/api/meeting");
+    const { token } = await setUpLoggedInSpeaker();
+
+    const response = await request(app)
+      .get("/api/meeting")
+      .set("Authorization", `Bearer ${token}`);
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual([]);
@@ -139,7 +165,9 @@ describe("GET /api/meeting/", () => {
       "insert into meeting set name='test', code='abc-123-def', speaker_duration=30, auto_proceed=false, state='NotStarted';"
     );
 
-    const responseAfterInsert = await request(app).get("/api/meeting");
+    const responseAfterInsert = await request(app)
+      .get("/api/meeting")
+      .set("Authorization", `Bearer ${token}`);
     expect(responseAfterInsert.status).toBe(200);
     expect(responseAfterInsert.body.length).toBe(1);
   });
@@ -148,8 +176,11 @@ describe("GET /api/meeting/", () => {
 describe("POST /api/meeting", () => {
   // create meeting
   it("should create a meeting", async () => {
+    const { token } = await setUpLoggedInSpeaker();
+
     const response = await request(app)
       .post("/api/meeting")
+      .set("Authorization", `Bearer ${token}`)
       .send({ name: "test meeting" })
       .expect("Content-Type", /json/)
       .expect(201);
@@ -169,8 +200,11 @@ describe("POST /api/meeting", () => {
   });
 
   it("should return a 400 when no meeting name is provided", async () => {
+    const { token } = await setUpLoggedInSpeaker();
+
     const response = await request(app)
       .post("/api/meeting")
+      .set("Authorization", `Bearer ${token}`)
       .send({ speakerDuration: 30, autoProceed: false })
       .expect(400);
 
@@ -179,8 +213,11 @@ describe("POST /api/meeting", () => {
   });
 
   it("should return a 400 when the speaker duration is invalid", async () => {
+    const { token } = await setUpLoggedInSpeaker();
+
     const response = await request(app)
       .post("/api/meeting")
+      .set("Authorization", `Bearer ${token}`)
       .send({ name: "test", speakerDuration: 15, autoProceed: false })
       .expect(400);
 
@@ -191,6 +228,7 @@ describe("POST /api/meeting", () => {
 
     const responseTooHigh = await request(app)
       .post("/api/meeting")
+      .set("Authorization", `Bearer ${token}`)
       .send({ name: "test", speakerDuration: 999, autoProceed: false })
       .expect(400);
 
@@ -198,8 +236,11 @@ describe("POST /api/meeting", () => {
   });
 
   it("should return a 400 when autoProceed is invalid", async () => {
+    const { token } = await setUpLoggedInSpeaker();
+
     const response = await request(app)
       .post("/api/meeting")
+      .set("Authorization", `Bearer ${token}`)
       .send({
         name: "test",
         speakerDuration: 30,
@@ -217,6 +258,8 @@ describe("POST /api/meeting", () => {
 describe("GET /api/meeting/:code", () => {
   // get meeting by code
   it("should return a meeting by code", async () => {
+    const { token } = await setUpLoggedInSpeaker();
+
     // given a meeting exists in the DB
     const meetingCode = "abc-123-def";
 
@@ -228,7 +271,9 @@ describe("GET /api/meeting/:code", () => {
     });
 
     // when we request the meeting by code
-    const response = await request(app).get(`/api/meeting/${meetingCode}`);
+    const response = await request(app)
+      .get(`/api/meeting/${meetingCode}`)
+      .set("Authorization", `Bearer ${token}`);
 
     // then we should get the meeting
     expect(response.status).toBe(200);
@@ -236,18 +281,24 @@ describe("GET /api/meeting/:code", () => {
   });
 
   it("should return a 404 when the meeting does not exist in the DB", async () => {
+    const { token } = await setUpLoggedInSpeaker();
+
     // when we request a meeting that does not exist
-    const response = await request(app).get("/api/meeting/xyz-123-abc");
+    const response = await request(app)
+      .get("/api/meeting/xyz-123-abc")
+      .set("Authorization", `Bearer ${token}`);
 
     // then we should get a 404
     expect(response.status).toBe(404);
   });
 
   it("should return a 400 when an invalid meeting code is provided", async () => {
+    const { token } = await setUpLoggedInSpeaker();
+
     // when we request a meeting with an invalid code
-    const response = await request(app).get(
-      "/api/meeting/invalid-meeting-code"
-    );
+    const response = await request(app)
+      .get("/api/meeting/invalid-meeting-code")
+      .set("Authorization", `Bearer ${token}`);
 
     // then we should get a 400
     expect(response.status).toBe(400);
@@ -357,6 +408,8 @@ describe("POST /api/speaker:login", () => {
 
 describe("POST /api/meeting/:code/speaker", () => {
   it("adds a speaker to a meeting", async () => {
+    const { speaker, token } = await setUpLoggedInSpeaker();
+
     // create a meeting
     const meeting = await meetingService.createMeeting({
       name: "test",
@@ -364,17 +417,10 @@ describe("POST /api/meeting/:code/speaker", () => {
       autoProceed: false,
     });
 
-    // create a speaker
-    const speaker = await speakerService.createSpeaker({
-      username: "test-speaker",
-      password: "password",
-      firstName: "Test",
-      lastName: "Speaker",
-    });
-
     // add the speaker to the meeting
     const response = await request(app)
       .post(`/api/meeting/${meeting.code}/speaker`)
+      .set("Authorization", `Bearer ${token}`)
       .send({ speakerId: speaker.id })
       .send({})
       .expect(201);
@@ -388,6 +434,8 @@ describe("POST /api/meeting/:code/speaker", () => {
 
 describe("POST /api/meeting/:code[:]start", () => {
   it("starts a meeting", async () => {
+    const { token } = await setUpLoggedInSpeaker();
+
     // create a meeting
     const meeting = await meetingService.createMeeting({
       name: "test-meeting",
@@ -417,6 +465,7 @@ describe("POST /api/meeting/:code[:]start", () => {
     // start the meeting
     const response = await request(app)
       .post(`/api/meeting/${meeting.code}:start`)
+      .set("Authorization", `Bearer ${token}`)
       .send({})
       .expect(200);
     expect(response.body.state).toBe(entity.MeetingState.InProgress);
@@ -432,8 +481,10 @@ describe("POST /api/meeting/:code[:]start", () => {
   });
 });
 
-describe("POST /api/meeting/:code[:]next WIP", () => {
+describe("POST /api/meeting/:code[:]next", () => {
   it("moves to the next speaker", async () => {
+    const { token } = await setUpLoggedInSpeaker();
+
     let webSocketMeetingUpdates: entity.Meeting[] = [];
 
     // create a meeting
@@ -483,6 +534,7 @@ describe("POST /api/meeting/:code[:]next WIP", () => {
     // start the meeting
     const response = await request(app)
       .post(`/api/meeting/${meeting.code}:start`)
+      .set("Authorization", `Bearer ${token}`)
       .send({})
       .expect(200);
     expect(response.body.state).toBe(entity.MeetingState.InProgress);
@@ -498,16 +550,24 @@ describe("POST /api/meeting/:code[:]next WIP", () => {
 
     // move to the next speaker
     expect(
-      (await request(app).post(`/api/meeting/${meeting.code}:next`).expect(200))
-        .body.speakerQueue
+      (
+        await request(app)
+          .post(`/api/meeting/${meeting.code}:next`)
+          .set("Authorization", `Bearer ${token}`)
+          .expect(200)
+      ).body.speakerQueue
     ).toEqual(speakerQueue.slice(1));
 
     waitForCondition(() => webSocketMeetingUpdates.length === 2);
 
     // move to the next speaker
     expect(
-      (await request(app).post(`/api/meeting/${meeting.code}:next`).expect(200))
-        .body.speakerQueue
+      (
+        await request(app)
+          .post(`/api/meeting/${meeting.code}:next`)
+          .set("Authorization", `Bearer ${token}`)
+          .expect(200)
+      ).body.speakerQueue
     ).toEqual(speakerQueue.slice(2));
 
     waitForCondition(() => webSocketMeetingUpdates.length === 3);
@@ -515,11 +575,26 @@ describe("POST /api/meeting/:code[:]next WIP", () => {
     // move to the last speaker
     const finalMeetingResponse = await request(app)
       .post(`/api/meeting/${meeting.code}:next`)
+      .set("Authorization", `Bearer ${token}`)
       .expect(200);
 
     // meeting has ended
     const finalMeeting = finalMeetingResponse.body;
     expect(finalMeeting.speakerQueue).toEqual(speakerQueue.slice(3));
     expect(finalMeeting.state).toBe(entity.MeetingState.Ended);
+  });
+});
+
+describe("Authentication", () => {
+  it("returns a 401 when no authorization token is passed", async () => {
+    const response = await request(app).get("/api/meeting");
+    expect(response.status).toBe(401);
+  });
+
+  it("returns a 401 when an invalid token is passed", async () => {
+    const response = await request(app)
+      .get("/api/meeting")
+      .set("Authorization", "Bearer invalid-token");
+    expect(response.status).toBe(401);
   });
 });
