@@ -8,3 +8,12 @@ services:
       - ./create-db.sql:/docker-entrypoint-initdb.d/create-db.sql
     ports:
       - "3306:3306"
+  db_test:
+    image: mariadb:11.2.4
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: roundrobin
+    volumes:
+      - ./create-db.sql:/docker-entrypoint-initdb.d/create-db.sql
+    ports:
+      - "3307:3306"

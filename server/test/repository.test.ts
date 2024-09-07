@@ -9,7 +9,7 @@ import { MeetingState } from "@App/domain/entity";
 // setup db connection and sql repository
 const dbConnection = mysql.createConnection({
   host: "0.0.0.0",
-  port: 3306,
+  port: 3307,
   user: "root", // defined in docker-compose.yml
   password: "password",
   database: "roundrobin",

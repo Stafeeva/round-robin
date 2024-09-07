@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 const Home: FC = () => {
   const navigate = useNavigate();
+  const [meetings, setMeetings] = React.useState([]);
 
   useEffect(() => {
     // get token from local storage
@@ -26,9 +27,17 @@ const Home: FC = () => {
         Authorization: `Bearer ${parsedToken.token}`,
       },
     })
-      .then((response) => response.json())
+      .then((response) => {
+        if (response.status === 401) {
+          navigate("/login");
+        }
+
+        // TODO check for 200 status code?
+        return response.json();
+      })
       .then((data) => {
         console.log("data", data);
+        setMeetings(data);
       });
   }, []);
 
@@ -49,13 +58,16 @@ const Home: FC = () => {
           padding: "72px",
         }}
       >
-        <Button type="primary">
-          <Link to="/create">Create a new meeting</Link>
-        </Button>
-        <Button type="primary">
-          <Link to="/join">Join a meeting</Link>
-        </Button>
+        <Link to="/create">Create a new meeting</Link>
+        <Link to="/join">Join a meeting</Link>
       </Flex>
+
+      <h2>My Meetings</h2>
+      {meetings.map((meeting: any) => (
+        <Link to={`/meeting/${meeting.code}`}>
+          {meeting.name} {meeting.code}
+        </Link>
+      ))}
     </Flex>
   );
 };

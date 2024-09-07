@@ -16,8 +16,13 @@ export class Service implements MeetingService {
     this.notificationService = notificationService;
   }
 
-  async listMeetings() {
-    return this.meetingRepository.listMeetings();
+  async listMeetings(speakerId?: number) {
+    const meetings = await this.meetingRepository.listMeetings();
+
+    // filter meetings to only include those that the speaker is a part of
+    return meetings.filter((meeting) =>
+      meeting.speakers.some((speaker) => speaker.id === speakerId)
+    );
   }
 
   async createMeeting(meeting: service.CreateMeeting) {

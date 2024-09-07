@@ -4,7 +4,10 @@ import * as db from "@App/domain/db";
 import { CreateMeeting, MeetingRepository } from "@App/domain/repository";
 import { dbSpeakerToEntitySpeaker } from "./speaker";
 
-const dbMeetingToEntityMeeting = (meeting: db.Meeting): entity.Meeting => {
+const dbMeetingToEntityMeeting = (
+  meeting: db.Meeting,
+  speakers: entity.Speaker[]
+): entity.Meeting => {
   return {
     id: meeting.id,
     name: meeting.name,
@@ -13,6 +16,10 @@ const dbMeetingToEntityMeeting = (meeting: db.Meeting): entity.Meeting => {
     createdAt: meeting.created_at,
     autoProceed: meeting.auto_proceed === 1,
     state: meeting.state as entity.MeetingState,
+    speakers: speakers.map((speaker) => {
+      const { password, ...rest } = speaker;
+      return rest;
+    }),
     speakerQueue: JSON.parse(meeting.speaker_queue),
   };
 };
@@ -31,8 +38,13 @@ export class SQLRepository implements MeetingRepository {
 
   async listMeetings(): Promise<entity.Meeting[]> {
     const meetings = await this.queries.list_meetings({}, this.adapter);
-    // convert from db type to domain entity
-    return meetings.map(dbMeetingToEntityMeeting);
+
+    return Promise.all(
+      meetings.map(async (meeting: db.Meeting) => {
+        const speakers = await this.getSpeakers(meeting.code);
+        return dbMeetingToEntityMeeting(meeting, speakers);
+      })
+    );
   }
 
   async getMeeting(code: string): Promise<entity.Meeting> {
@@ -45,7 +57,9 @@ export class SQLRepository implements MeetingRepository {
       throw new entity.MeetingNotFoundError();
     }
 
-    return dbMeetingToEntityMeeting(meeting[0]);
+    const speakers = await this.getSpeakers(code);
+
+    return dbMeetingToEntityMeeting(meeting[0], speakers);
   }
 
   async createMeeting(meeting: CreateMeeting): Promise<entity.Meeting> {

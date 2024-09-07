@@ -42,6 +42,10 @@ const Login: FC<{}> = () => {
         type="password"
       />
       <Button onClick={handleLogin}>Login</Button>
+
+      <Button onClick={() => navigate("/create-account")}>
+        Create Account
+      </Button>
     </div>
   );
 };

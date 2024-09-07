@@ -9,7 +9,7 @@ export type CreateMeeting = {
 };
 
 export interface MeetingService {
-  listMeetings(): Promise<entity.Meeting[]>;
+  listMeetings(speakerId?: number): Promise<entity.Meeting[]>;
   createMeeting(meeting: CreateMeeting): Promise<entity.Meeting>;
   getMeeting(code: string): Promise<entity.Meeting>;
   addSpeakerToMeeting(
