@@ -27,7 +27,7 @@ const CreateMeeting: FC = () => {
       autoProceed,
     };
 
-    const response = await fetch("/api/meeting", {
+    const response = await fetch("/api/meeting/", {
       method: "POST",
       body: JSON.stringify(payload),
       headers: {

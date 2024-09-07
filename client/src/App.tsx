@@ -1,11 +1,8 @@
 import React, { FC, useEffect } from "react";
-import { io } from "socket.io-client";
 import { Attendee, Note, Action } from "../../server/serverPrototype";
 import { Button, Input } from "antd";
 import "./App.css";
 import Meeting from "./LegacyMeeting";
-
-//const socket = io();
 
 export const AddAction = ({ attendees }: { attendees: Attendee[] }) => {
   const [assignee, setAssignee] = React.useState<string>("");

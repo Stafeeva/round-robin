@@ -62,7 +62,9 @@ export class Service implements MeetingService {
 
   async getMeeting(code: string) {
     if (service.isValidMeetingCode(code)) {
-      return this.meetingRepository.getMeeting(code);
+      const meeting = await this.meetingRepository.getMeeting(code);
+
+      return meeting;
     } else {
       throw new entity.InvalidMeetingCodeError();
     }
