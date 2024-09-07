@@ -34,8 +34,7 @@ export class SQLRepository implements SpeakerRepository {
       last_name: speaker.lastName,
     };
 
-    await this.queries.create_speaker(newSpeakerData, this.adapter);
-
+    const res = await this.queries.create_speaker(newSpeakerData, this.adapter);
     return this.getSpeaker(speaker.username);
   }
 

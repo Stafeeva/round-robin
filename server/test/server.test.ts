@@ -35,7 +35,7 @@ app.use(express.static("../../client/build"));
 
 const dbConnection = mysql.createConnection({
   host: "0.0.0.0",
-  port: 3306,
+  port: 3307,
   user: "root", // defined in docker-compose.yml
   password: "password",
   database: "roundrobin",
@@ -150,8 +150,8 @@ const setUpLoggedInSpeaker = async () => {
 };
 
 describe("GET /api/meeting/", () => {
-  it("should return a list of meetings", async () => {
-    const { token } = await setUpLoggedInSpeaker();
+  it("should return a list of meetings WIP", async () => {
+    const { speaker, token } = await setUpLoggedInSpeaker();
 
     const response = await request(app)
       .get("/api/meeting")
@@ -165,11 +165,29 @@ describe("GET /api/meeting/", () => {
       "insert into meeting set name='test', code='abc-123-def', speaker_duration=30, auto_proceed=false, state='NotStarted';"
     );
 
+    // list meetings only returns meetings that the logged in user is part of
+
+    // meeting is not returned as the speaker is not part of the meeting
     const responseAfterInsert = await request(app)
       .get("/api/meeting")
       .set("Authorization", `Bearer ${token}`);
     expect(responseAfterInsert.status).toBe(200);
-    expect(responseAfterInsert.body.length).toBe(1);
+    expect(responseAfterInsert.body.length).toBe(0);
+
+    // add logged in speaker to the meeting
+    await meetingService.addSpeakerToMeeting("abc-123-def", speaker.id);
+
+    const responseAfterAddingSpeakerToMeeting = await request(app)
+      .get("/api/meeting")
+      .set("Authorization", `Bearer ${token}`);
+    expect(responseAfterAddingSpeakerToMeeting.status).toBe(200);
+    expect(responseAfterAddingSpeakerToMeeting.body.length).toBe(1);
+
+    expect(responseAfterAddingSpeakerToMeeting.body[0].speakers.length).toBe(1);
+
+    expect(
+      responseAfterAddingSpeakerToMeeting.body[0].speakers[0].username
+    ).toBe(speaker.username);
   });
 });
 
@@ -422,7 +440,6 @@ describe("POST /api/meeting/:code/speaker", () => {
       .post(`/api/meeting/${meeting.code}/speaker`)
       .set("Authorization", `Bearer ${token}`)
       .send({ speakerId: speaker.id })
-      .send({})
       .expect(201);
 
     // expect the speaker to be added to the meeting

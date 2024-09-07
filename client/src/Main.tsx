@@ -1,13 +1,21 @@
 import React, { FC } from "react";
-import App from "./App";
-import Join from "./Join";
 
 const Main: FC = () => {
-  const [name, setName] = React.useState<string>("");
+  const [meetingCode, setMeetingCode] = React.useState<string>("");
+
+  const joinMeeting = async () => {
+    console.log("join meeting with code", meetingCode);
+  };
 
   return (
     <div>
-      {name ? <App attendeeName={name} /> : <Join joinMeeting={setName} />}
+      Meeting code:
+      <input
+        type="text"
+        value={meetingCode}
+        onChange={(e) => setMeetingCode(e.target.value)}
+      />
+      <button onClick={joinMeeting}>Join</button>
     </div>
   );
 };

@@ -39,6 +39,9 @@ export class Server {
 
         try {
           const verified = await speakerService.verifyToken(token);
+
+          // @ts-ignore
+          req.speakerId = verified.speakerId;
           return next();
         } catch (error) {
           if (error instanceof entity.InvalidTokenError) {
@@ -55,7 +58,9 @@ export class Server {
     this.app.use(authMiddleware);
 
     this.app.get("/api/meeting", async (req, res) => {
-      const meetings = await meetingService.listMeetings();
+      // @ts-ignore
+      const speakerId = req.speakerId;
+      const meetings = await meetingService.listMeetings(speakerId);
       res.json(meetings);
     });
 

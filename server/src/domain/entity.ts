@@ -16,6 +16,7 @@ export type Meeting = {
   autoProceed: boolean;
   state: MeetingState;
   createdAt: Date;
+  speakers: SpeakerWithoutPassword[];
   speakerQueue: number[];
 };
 
@@ -26,6 +27,8 @@ export type Speaker = {
   firstName: string;
   lastName: string;
 };
+
+export type SpeakerWithoutPassword = Omit<Speaker, "password">;
 
 /**
  * Errors
