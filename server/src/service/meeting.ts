@@ -1,18 +1,21 @@
 import * as service from "@App/domain/service";
 import { NotificationService, MeetingService } from "@App/domain/service";
-import { MeetingRepository } from "@App/domain/repository";
+import { MeetingRepository, NoteRepository } from "@App/domain/repository";
 import * as repository from "@App/domain/repository";
 import * as entity from "@App/domain/entity";
 
 export class Service implements MeetingService {
   private meetingRepository: MeetingRepository;
+  private noteRepository: NoteRepository;
   private notificationService: NotificationService;
 
   constructor(
     meetingRepository: MeetingRepository,
+    noteRepository: NoteRepository,
     notificationService: NotificationService
   ) {
     this.meetingRepository = meetingRepository;
+    this.noteRepository = noteRepository;
     this.notificationService = notificationService;
   }
 
@@ -128,5 +131,33 @@ export class Service implements MeetingService {
     this.notificationService.notify(updatedMeeting);
     // return the updated meeting
     return updatedMeeting;
+  }
+
+  // handle notes
+
+  async addNoteToMeeting(
+    code: string,
+    note: service.CreateNote
+  ): Promise<entity.Meeting> {
+    // TODO meeting must exist
+    // TODO note must exist
+
+    const meeting = await this.meetingRepository.getMeeting(code);
+
+    // add note to the meeting
+    const foo = await this.noteRepository.createNote({
+      meetingId: meeting.id,
+      speakerId: note.speakerId,
+      text: note.text,
+    });
+
+    // TODO
+    // meeting model does not currently contain notes, needs to be added
+    // so the updated meeting can be sent via the notification service
+
+    const updatedMeeting = await this.meetingRepository.getMeeting(code);
+    this.notificationService.notify(updatedMeeting);
+
+    return meeting;
   }
 }

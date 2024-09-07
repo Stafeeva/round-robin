@@ -36,3 +36,11 @@ describe speaker;
 describe meeting_speaker;
 select * from meeting;
 ```
+
+To rebuild the DB after a change (e.g. adding a field):
+
+```bash
+docker-compose rm
+docker volume prune
+docker-compose up
+```

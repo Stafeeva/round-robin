@@ -8,6 +8,7 @@ import { Server as SocketIOServer } from "socket.io";
 import { Server } from "../src/server";
 import * as meeting from "@App/repository/meeting";
 import * as speaker from "@App/repository/speaker";
+import * as note from "@App/repository/note";
 import { Service as MeetingService } from "@App/service/meeting";
 import { Service as SpeakerService } from "@App/service/speaker";
 import * as service from "@App/domain/service";
@@ -61,10 +62,13 @@ const speakerRepository = new speaker.SQLRepository(
   pureSQLQueries
 );
 
+const noteRepository = new note.SQLRepository(pureSQLAdapter, pureSQLQueries);
+
 const notificationService = new NotificationService(socketIOServer);
 
 const meetingService = new MeetingService(
   meetingRepository,
+  noteRepository,
   notificationService
 );
 const speakerService = new SpeakerService(speakerRepository);
@@ -90,6 +94,8 @@ beforeEach(() => {
   dbConnection.query("TRUNCATE TABLE meeting");
   dbConnection.query("TRUNCATE TABLE speaker");
   dbConnection.query("TRUNCATE TABLE meeting_speaker");
+  dbConnection.query("TRUNCATE TABLE note");
+  dbConnection.query("TRUNCATE TABLE action");
   dbConnection.query("SET FOREIGN_KEY_CHECKS = 1");
 });
 
@@ -613,5 +619,33 @@ describe("Authentication", () => {
       .get("/api/meeting")
       .set("Authorization", "Bearer invalid-token");
     expect(response.status).toBe(401);
+  });
+});
+
+describe("POST /api/meeting/:code/note", () => {
+  it("adds a note to a meeting", async () => {
+    const { speaker, token } = await setUpLoggedInSpeaker();
+
+    // create a meeting
+    const meeting = await meetingService.createMeeting({
+      name: "test",
+      speakerDuration: 30,
+      autoProceed: false,
+    });
+
+    // with a speaker
+    await request(app)
+      .post(`/api/meeting/${meeting.code}/speaker`)
+      .set("Authorization", `Bearer ${token}`)
+      .send({ speakerId: speaker.id })
+      .expect(201);
+
+    // add a note to the meeting
+    const response = await request(app)
+      .post(`/api/meeting/${meeting.code}/note`)
+      .set("Authorization", `Bearer ${token}`)
+      .send({ text: "A test note" })
+      .expect("Content-Type", /json/)
+      .expect(201);
   });
 });

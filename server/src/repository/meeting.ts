@@ -114,4 +114,12 @@ export class SQLRepository implements MeetingRepository {
     );
     return;
   }
+
+  async addNoteToMeeting(meetingId: number, noteId: number): Promise<void> {
+    await this.queries.add_note_to_meeting(
+      { meeting_id: meetingId, note_id: noteId },
+      this.adapter
+    );
+    return;
+  }
 }

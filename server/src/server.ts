@@ -161,5 +161,32 @@ export class Server {
 
       res.status(200).json(meeting);
     });
+
+    this.app.post("/api/meeting/:code/note", async (req, res) => {
+      const meetingCode = req.params.code;
+
+      // @ts-ignore
+      const speakerId = req.speakerId as number;
+
+      const meeting = await meetingService.addNoteToMeeting(meetingCode, {
+        speakerId,
+        text: req.body.text,
+      });
+
+      // TODO create note service
+      // TODO add note to meeting
+      res.status(201).json(meeting);
+    });
+
+    // TODO note routes
+    // get notes ? maybe not needed if just return meeting
+    // edit a note
+    // delete a note
+
+    // TODO action routes
+    // add an action
+    // edit an action ?
+    // mark action as completed ? (maybe just edit)
+    // delete an action
   }
 }

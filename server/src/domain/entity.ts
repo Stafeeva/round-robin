@@ -8,6 +8,9 @@ export enum MeetingState {
   Ended = "Ended",
 }
 
+// TODO: separate Meeting model for list meetings
+// more info on the individual meeting model ?
+
 export type Meeting = {
   id: number;
   name: string;
@@ -17,6 +20,8 @@ export type Meeting = {
   state: MeetingState;
   createdAt: Date;
   speakers: SpeakerWithoutPassword[];
+  // TODO: add notes
+  // TODO: add actions
   speakerQueue: number[];
 };
 
@@ -29,6 +34,14 @@ export type Speaker = {
 };
 
 export type SpeakerWithoutPassword = Omit<Speaker, "password">;
+
+export type Note = {
+  id: number;
+  meetingId: number;
+  speakerId: number;
+  text: string;
+  createdAt: Date;
+};
 
 /**
  * Errors

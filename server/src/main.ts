@@ -13,6 +13,7 @@ import * as meeting from "@App/repository/meeting";
 import { Service as MeetingService } from "@App/service/meeting";
 import * as speaker from "@App/repository/speaker";
 import { Service as SpeakerService } from "@App/service/speaker";
+import * as note from "@App/repository/note";
 
 const PORT = process.env.PORT || 8000;
 
@@ -57,10 +58,13 @@ const speakerRepository = new speaker.SQLRepository(
   pureSQLQueries
 );
 
+const noteRepository = new note.SQLRepository(pureSQLAdapter, pureSQLQueries);
+
 const notificationService = new NotificationService(io);
 
 const meetingService = new MeetingService(
   meetingRepository,
+  noteRepository,
   notificationService
 );
 const speakerService = new SpeakerService(speakerRepository);

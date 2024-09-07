@@ -111,6 +111,10 @@ const Meeting: FC = () => {
         <p key={speaker}>{speaker}</p>
       ))}
 
+      <div>Notes</div>
+      <p>TODO: list notes</p>
+      <p>TODO: form to add a note to the meeting</p>
+
       <Link to={`/`}>Back to home</Link>
     </div>
   );

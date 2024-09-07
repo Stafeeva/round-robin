@@ -36,3 +36,15 @@ export interface SpeakerRepository {
   createSpeaker(speaker: CreateSpeaker): Promise<entity.Speaker>;
   getSpeaker(username: string): Promise<entity.Speaker>;
 }
+
+export type CreateNote = {
+  meetingId: number;
+  speakerId: number;
+  text: string;
+};
+
+export interface NoteRepository {
+  createNote(note: CreateNote): Promise<entity.Note>;
+  getNote(noteId: number): Promise<entity.Note>;
+  // getNotes(meetingId: number): Promise<entity.Note[]>;
+}

@@ -42,3 +42,12 @@ AND s.id = ms.speaker_id
 -- name: add_speaker_to_meeting
 INSERT INTO meeting_speaker (meeting_id, speaker_id)
 VALUES (:meeting_id, :speaker_id)
+
+-- name: create_note
+INSERT INTO note (meeting_id, speaker_id, text)
+VALUES (:meeting_id, :speaker_id, :text)
+
+-- name: get_note
+SELECT *
+FROM note
+WHERE id = :id
