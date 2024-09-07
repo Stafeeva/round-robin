@@ -8,6 +8,11 @@ export type CreateMeeting = {
   autoProceed?: boolean;
 };
 
+export type CreateNote = {
+  speakerId: number;
+  text: string;
+};
+
 export interface MeetingService {
   listMeetings(speakerId?: number): Promise<entity.Meeting[]>;
   createMeeting(meeting: CreateMeeting): Promise<entity.Meeting>;
@@ -18,6 +23,7 @@ export interface MeetingService {
   ): Promise<entity.Meeting>;
   startMeeting(code: string): Promise<entity.Meeting>;
   moveToNextSpeaker(code: string): Promise<entity.Meeting>;
+  addNoteToMeeting(code: string, note: CreateNote): Promise<entity.Meeting>;
 }
 
 export interface NotificationService {

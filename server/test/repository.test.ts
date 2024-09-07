@@ -28,6 +28,8 @@ beforeEach(() => {
   dbConnection.query("TRUNCATE TABLE meeting");
   dbConnection.query("TRUNCATE TABLE speaker");
   dbConnection.query("TRUNCATE TABLE meeting_speaker");
+  dbConnection.query("TRUNCATE TABLE note");
+  dbConnection.query("TRUNCATE TABLE action");
   dbConnection.query("SET FOREIGN_KEY_CHECKS = 1");
 });
 

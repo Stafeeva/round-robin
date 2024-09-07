@@ -16,3 +16,11 @@ export type Speaker = {
   first_name: string;
   last_name: string;
 };
+
+export type Note = {
+  id: number;
+  meeting_id: number;
+  speaker_id: number;
+  text: string;
+  created_at: Date;
+};
