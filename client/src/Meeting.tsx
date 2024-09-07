@@ -1,24 +1,119 @@
-import React, { FC } from "react";
+import { Button } from "antd";
+import React, { FC, useEffect } from "react";
 import { useParams } from "react-router";
+import { Link } from "react-router-dom";
+
+import { io } from "socket.io-client";
+
+type Token = {
+  speakerId: number;
+  token: string;
+};
 
 const Meeting: FC = () => {
-  // TOOD - load meeting from server
+  const [meeting, setMeeting] = React.useState<any>({});
 
   // get meeting code from url
   const meetingCode = useParams().code;
-  console.log("meetingCode", meetingCode);
+  const token: Token = JSON.parse(localStorage.getItem("token") as string);
 
-  // TODO - fetch meeting data from server and save in staate
-  // will need to use useEffect and fetch (and get token from local storage)
+  useEffect(() => {
+    // set up web socket to subscribe to updates for this meeting
+    const socket = io();
 
-  // TODO - display meeting data
+    // when socket connects, join room
+    socket.on("connect", () => {
+      socket.emit("joinRoom", meetingCode);
+    });
 
-  // TODO - set up web sockets (and close web socket on unmount)
-  // will get updated meeting via web sockets and update state (e.g. as move to next speaker / speaker joins meeting etc)
+    socket.on("meetingUpdated", (data: any) => {
+      setMeeting(data);
+    });
 
-  // TODO - button to start meeting / move to next speaker & logic to handle that
+    const fetchMeeting = async () => {
+      const res = await fetch(`/api/meeting/${meetingCode}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token.token}`,
+        },
+      });
+      const data = await res.json();
+      setMeeting(data);
+    };
 
-  return <div>Meeting</div>;
+    // fetch meeting data from server
+    fetchMeeting();
+
+    return () => {
+      // close web socket
+      // should not receive updates for this meeting if not on the meeting screen
+      socket.close();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleStartMeeting = async () => {
+    await fetch(`/api/meeting/${meetingCode}:start`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token.token}`,
+      },
+    });
+  };
+
+  const handleNext = async () => {
+    await fetch(`/api/meeting/${meetingCode}:next`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token.token}`,
+      },
+    });
+  };
+
+  const handleResetMeeting = async () => {
+    await fetch("/api/meeting:reset", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token.token}`,
+      },
+    });
+  };
+
+  return (
+    <div>
+      <h2>
+        {meeting.name} {meeting.state}
+      </h2>
+      <div className="meeting-actions">
+        {meeting?.state === "NotStarted" ? (
+          <Button onClick={handleStartMeeting}>Start</Button>
+        ) : (
+          <Button onClick={handleResetMeeting}>Reset</Button>
+        )}
+        {meeting?.state === "InProgress" && (
+          <Button onClick={handleNext}>
+            {meeting?.speakerQueue?.length === 0 ? "Finish" : "Next"}
+          </Button>
+        )}
+      </div>
+      <div>
+        <h2>Attendees</h2>
+        {meeting.speakers?.map((speaker: any) => (
+          <p key={speaker.id}>{speaker.firstName}</p>
+        ))}
+      </div>
+      <div>Speaker queue</div>
+      {meeting.speakerQueue?.map((speaker: any) => (
+        <p key={speaker}>{speaker}</p>
+      ))}
+
+      <Link to={`/`}>Back to home</Link>
+    </div>
+  );
 };
 
 export default Meeting;
