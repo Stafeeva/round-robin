@@ -15,6 +15,8 @@ import * as speaker from "@App/repository/speaker";
 import { Service as SpeakerService } from "@App/service/speaker";
 import * as note from "@App/repository/note";
 
+import * as action from "@App/repository/action";
+
 const PORT = process.env.PORT || 8000;
 
 const app: express.Application = express();
@@ -60,11 +62,17 @@ const speakerRepository = new speaker.SQLRepository(
 
 const noteRepository = new note.SQLRepository(pureSQLAdapter, pureSQLQueries);
 
+const actionRepository = new action.SQLRepository(
+  pureSQLAdapter,
+  pureSQLQueries
+);
+
 const notificationService = new NotificationService(io);
 
 const meetingService = new MeetingService(
   meetingRepository,
   noteRepository,
+  actionRepository,
   notificationService
 );
 const speakerService = new SpeakerService(speakerRepository);

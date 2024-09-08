@@ -24,3 +24,13 @@ export type Note = {
   text: string;
   created_at: Date;
 };
+
+export type Action = {
+  id: number;
+  meeting_id: number;
+  created_at: Date;
+  created_by: number;
+  owner_id: number;
+  text: string;
+  completed: number;
+};

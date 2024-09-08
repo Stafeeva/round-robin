@@ -3,19 +3,41 @@ import { Attendee, Note, Action } from "../../server/serverPrototype";
 import { Button, Input } from "antd";
 import "./App.css";
 import Meeting from "./LegacyMeeting";
+import { Link, useNavigate } from "react-router-dom";
 
-export const AddAction = ({ attendees }: { attendees: Attendee[] }) => {
-  const [assignee, setAssignee] = React.useState<string>("");
+type Speaker = {
+  firstName: string;
+  lastName: string;
+  id: number;
+};
+
+export const AddAction: FC<{ meetingCode: string; speakers: Speaker[] }> = ({
+  meetingCode,
+  speakers,
+}) => {
+  const [owner, setOwner] = React.useState<number>(speakers?.[0].id);
   const [text, setText] = React.useState<string>("");
 
+  const navigate = useNavigate();
+
   const handleAddAction = async () => {
-    await fetch("/api/action", {
+    const payload = { ownerId: owner, text };
+
+    const token = JSON.parse(localStorage.getItem("token") as string);
+
+    const response = await fetch(`/api/meeting/${meetingCode}/action`, {
       method: "POST",
-      body: JSON.stringify({ assignee, text }),
+      body: JSON.stringify(payload),
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${token.token}`,
       },
     });
+
+    // if response is 401 then the token is invalid, redirect to login
+    if (response.status === 401) {
+      navigate("/login");
+    }
 
     setText("");
   };
@@ -29,14 +51,16 @@ export const AddAction = ({ attendees }: { attendees: Attendee[] }) => {
     >
       <label htmlFor="assignee">Assignee: </label>
       <select
+        required
         id="assignee"
+        defaultValue={speakers?.[0].id}
         onChange={(e) => {
-          setAssignee(e.currentTarget.value);
+          setOwner(Number(e.currentTarget.value));
         }}
       >
-        {attendees.map((attendee, i) => (
-          <option key={i} value={attendee.name}>
-            {attendee.name}
+        {speakers?.map((speaker, i) => (
+          <option key={i} value={speaker.id}>
+            {speaker.firstName} {speaker.lastName}
           </option>
         ))}
       </select>
@@ -46,7 +70,7 @@ export const AddAction = ({ attendees }: { attendees: Attendee[] }) => {
         onChange={(e) => setText(e.currentTarget.value)}
         value={text}
       />
-      <Button>Add Action</Button>
+      <Button onClick={handleAddAction}>Add Action</Button>
     </form>
   );
 };

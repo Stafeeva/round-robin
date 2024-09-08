@@ -3,7 +3,6 @@ import * as entity from "@App/domain/entity";
 import * as db from "@App/domain/db";
 import { CreateNote, NoteRepository } from "@App/domain/repository";
 import { OkPacket } from "mysql";
-import { get } from "http";
 
 const dbNoteToEntityNote = (note: db.Note): entity.Note => ({
   id: note.id,
