@@ -10,13 +10,68 @@ import { useNavigate } from "react-router-dom";
 import { AddAction } from "./App";
 import ActionItem from "./components/ActionItem";
 
+enum MeetingState {
+  NotStarted = "NotStarted",
+  InProgress = "InProgress",
+  Ended = "Ended",
+}
+
+type Meeting = {
+  id: number;
+  name: string;
+  code: string;
+  speakerDuration: number;
+  autoProceed: boolean;
+  state: MeetingState;
+  createdAt: Date;
+  speakerQueue: number[];
+};
+
+export type MeetingAggregate = Meeting & {
+  speakers: Speaker[];
+  notes: Note[];
+  actions: Action[];
+};
+
+type Speaker = {
+  id: number;
+  username: string;
+  firstName: string;
+  lastName: string;
+};
+
+type Note = {
+  id: number;
+  meetingId: number;
+  speakerId: number;
+  text: string;
+  createdAt: Date;
+};
+
+type Action = {
+  id: number;
+  meetingId: number;
+  createdAt: Date;
+  createdBy: number; // speaker who created the action
+  ownerId: number; // speaker who the action is for
+  text: string;
+  completed: boolean;
+};
+
+type TimerEvent = {
+  secondsRemaining: number;
+  meetingCode: string;
+};
+
 type Token = {
   speakerId: number;
   token: string;
 };
 
 const Meeting: FC = () => {
-  const [meeting, setMeeting] = React.useState<any>({});
+  const [meeting, setMeeting] = React.useState<MeetingAggregate | null>(null);
+
+  const [timerEvent, setTimerEvent] = React.useState<TimerEvent | null>(null);
 
   const navigate = useNavigate();
 
@@ -35,6 +90,10 @@ const Meeting: FC = () => {
 
     socket.on("meetingUpdated", (data: any) => {
       setMeeting(data);
+    });
+
+    socket.on("timerEvent", (timerEvent: TimerEvent) => {
+      setTimerEvent(timerEvent);
     });
 
     const fetchMeeting = async () => {
@@ -96,11 +155,27 @@ const Meeting: FC = () => {
     });
   };
 
+  if (!meeting) {
+    return <div>Loading...</div>;
+  }
+
+  const timerMessage =
+    timerEvent && timerEvent.secondsRemaining === 0
+      ? "Time's up!"
+      : timerEvent?.secondsRemaining;
+
   return (
     <div>
       <h2>
         {meeting.name} {meeting.state}
       </h2>
+
+      <div>
+        {meeting.state === MeetingState.InProgress && timerEvent && (
+          <p>Timer: {timerMessage}</p>
+        )}
+      </div>
+
       <div className="meeting-actions">
         {meeting?.state === "NotStarted" ? (
           <Button onClick={handleStartMeeting}>Start</Button>

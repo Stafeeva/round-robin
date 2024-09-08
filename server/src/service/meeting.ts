@@ -8,11 +8,36 @@ import {
 import * as repository from "@App/domain/repository";
 import * as entity from "@App/domain/entity";
 
+const startCountdown = (
+  seconds: number,
+  onTick: (secondsRemaining: number) => void,
+  onComplete: () => void
+) => {
+  let timeoutId: NodeJS.Timeout;
+
+  const countdown = (remainingSeconds: number) => {
+    if (remainingSeconds > 0) {
+      onTick(remainingSeconds);
+      timeoutId = setTimeout(() => countdown(remainingSeconds - 1), 1000);
+    } else {
+      onComplete();
+    }
+  };
+
+  countdown(seconds);
+
+  return () => {
+    clearTimeout(timeoutId);
+  };
+};
+
 export class Service implements MeetingService {
   private meetingRepository: MeetingRepository;
   private noteRepository: NoteRepository;
   private actionRepository: ActionRepository;
   private notificationService: NotificationService;
+
+  private meetingCodeToTimeout: Record<string, () => void> = {};
 
   constructor(
     meetingRepository: MeetingRepository,
@@ -126,7 +151,49 @@ export class Service implements MeetingService {
 
     this.notificationService.notify(await this.getMeeting(code));
 
+    this.startTimer(updatedMeeting);
+
     return updatedMeeting;
+  }
+
+  cancelTimer(meeting: entity.Meeting) {
+    // if already have a timer for the meeting
+    if (this.meetingCodeToTimeout[meeting.code]) {
+      // cancel the existing timer
+      this.meetingCodeToTimeout[meeting.code]();
+    }
+  }
+
+  startTimer(meeting: entity.Meeting) {
+    this.cancelTimer(meeting);
+
+    const cancelTimeout = startCountdown(
+      meeting.speakerDuration,
+
+      // timer tick
+      async (secondsRemaining: number) => {
+        this.notificationService.notifyTimerEvent({
+          secondsRemaining,
+          meetingCode: meeting.code,
+        });
+      },
+
+      // timer complete
+      async () => {
+        this.notificationService.notifyTimerEvent({
+          secondsRemaining: 0,
+          meetingCode: meeting.code,
+        });
+
+        delete this.meetingCodeToTimeout[meeting.code];
+
+        if (meeting.autoProceed) {
+          await this.moveToNextSpeaker(meeting.code);
+        }
+      }
+    );
+
+    this.meetingCodeToTimeout[meeting.code] = cancelTimeout;
   }
 
   async moveToNextSpeaker(code: string): Promise<entity.Meeting> {
@@ -151,6 +218,12 @@ export class Service implements MeetingService {
     );
 
     this.notificationService.notify(await this.getMeeting(code));
+
+    if (nextMeetingState == entity.MeetingState.InProgress) {
+      this.startTimer(updatedMeeting);
+    } else if (nextMeetingState == entity.MeetingState.Ended) {
+      this.cancelTimer(meeting);
+    }
     // return the updated meeting
     return updatedMeeting;
   }

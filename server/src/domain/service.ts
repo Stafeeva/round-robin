@@ -38,6 +38,7 @@ export interface MeetingService {
 
 export interface NotificationService {
   notify(meeting: entity.MeetingAggregate): Promise<void>;
+  notifyTimerEvent(timerEvent: entity.TimerEvent): Promise<void>;
 }
 
 export type CreateSpeaker = {
