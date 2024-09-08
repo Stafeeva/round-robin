@@ -4,12 +4,10 @@ import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 
 import "./Note.css";
 
-type NoteProps = { note: { speakerId: number; text: string } };
+type NoteProps = { speakerName: string; text: string };
 
 // TODO: implement delete and edit note
-const Note: FC<NoteProps> = ({ note }) => {
-  const { speakerId, text } = note;
-
+const Note: FC<NoteProps> = ({ speakerName, text }) => {
   const deleteNote = async () => {
     console.log("delete note");
   };
@@ -29,7 +27,8 @@ const Note: FC<NoteProps> = ({ note }) => {
     >
       <div className="note__container">
         <div className="note__message">
-          <strong>{speakerId}: </strong>
+          <strong>{speakerName}</strong>
+          <br />
           {text}
         </div>
         <div className="note__actions">

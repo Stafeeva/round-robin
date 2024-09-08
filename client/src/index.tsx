@@ -1,7 +1,6 @@
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
-import "./index.css";
 import Main from "./Main";
 import Home from "./Home";
 import CreateMeeting from "./CreateMeeting";
@@ -9,30 +8,57 @@ import Meeting from "./Meeting";
 import Login from "./Login";
 import CreateAccount from "./CreateAccount";
 
+import "./index.css";
+import Layout from "./Layout";
+
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Home />,
+    element: (
+      <Layout>
+        <Home />
+      </Layout>
+    ),
   },
   {
     path: "/login",
-    element: <Login />,
+    element: (
+      <Layout>
+        <Login />
+      </Layout>
+    ),
   },
   {
     path: "/create-account",
-    element: <CreateAccount />,
+    element: (
+      <Layout>
+        <CreateAccount />
+      </Layout>
+    ),
   },
   {
     path: "/join",
-    element: <Main />,
+    element: (
+      <Layout>
+        <Main />
+      </Layout>
+    ),
   },
   {
     path: "/create",
-    element: <CreateMeeting />,
+    element: (
+      <Layout>
+        <CreateMeeting />
+      </Layout>
+    ),
   },
   {
     path: "/meeting/:code",
-    element: <Meeting />,
+    element: (
+      <Layout>
+        <Meeting />
+      </Layout>
+    ),
   },
 ]);
 

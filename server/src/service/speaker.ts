@@ -59,6 +59,7 @@ export class Service implements SpeakerService {
 
     return {
       speakerId: speaker.id,
+      username: speaker.username,
       token: token,
     };
   }

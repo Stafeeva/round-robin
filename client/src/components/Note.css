@@ -11,4 +11,5 @@
 .note__actions {
   display: flex;
   margin-left: 16px;
+  align-items: center;
 }

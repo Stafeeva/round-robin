@@ -1,13 +1,18 @@
-import { Button } from "antd";
+import { Avatar, Button, Flex } from "antd";
 import React, { FC, useEffect } from "react";
 import { useParams } from "react-router";
 import { Link } from "react-router-dom";
+import {
+  UserOutlined,
+  CaretRightOutlined,
+  RedoOutlined,
+} from "@ant-design/icons";
 
 import { io } from "socket.io-client";
 import AddNote from "./components/AddNote";
 import NoteItem from "./components/Note";
 import { useNavigate } from "react-router-dom";
-import { AddAction } from "./App";
+import AddAction from "./components/AddAction";
 import ActionItem from "./components/ActionItem";
 
 enum MeetingState {
@@ -159,83 +164,138 @@ const Meeting: FC = () => {
     return <div>Loading...</div>;
   }
 
+  const getSpeakerNameById = (id: number): string => {
+    return (
+      meeting.speakers.find((speaker) => speaker.id === id)?.firstName || ""
+    );
+  };
+
+  const formatSecondsToMMSS = (totalSeconds: number): string => {
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${minutes.toString().padStart(2, "0")}:${seconds
+      .toString()
+      .padStart(2, "0")}`;
+  };
+
   const timerMessage =
     timerEvent && timerEvent.secondsRemaining === 0
-      ? "Time's up!"
-      : timerEvent?.secondsRemaining;
+      ? `Time's up ${getSpeakerNameById(meeting.speakerQueue[0])}!`
+      : "Remaining: " + formatSecondsToMMSS(timerEvent?.secondsRemaining || 0);
 
   return (
-    <div>
-      <h2>
-        {meeting.name} {meeting.state}
-      </h2>
-
+    <div style={{ width: "100%" }}>
+      <h1>{meeting.name}</h1>
+      <div>
+        <h2>Attendees</h2>
+        <Flex style={{ gap: "24px", justifyContent: "center" }}>
+          {meeting.speakers?.map((speaker: Speaker) => (
+            <div
+              style={{
+                border: `2px solid ${
+                  speaker.id === meeting.speakerQueue[0] ? " #008080" : "white"
+                }`,
+                padding: "16px 16px 0 16px",
+                borderRadius: "8px",
+              }}
+            >
+              <Avatar
+                size={64}
+                icon={<UserOutlined />}
+                // style={{ backgroundColor: "#008080" }}
+              />
+              <p key={speaker.id}>{speaker.firstName}</p>
+            </div>
+          ))}
+        </Flex>
+      </div>
       <div>
         {meeting.state === MeetingState.InProgress && timerEvent && (
-          <p>Timer: {timerMessage}</p>
+          <>
+            <h2>
+              Current speaker: {getSpeakerNameById(meeting.speakerQueue[0])}
+            </h2>
+            <p
+              style={{
+                fontSize: "36px",
+                color: timerEvent?.secondsRemaining < 16 ? "red" : "black",
+              }}
+            >
+              {timerMessage}
+            </p>
+          </>
         )}
       </div>
 
-      <div className="meeting-actions">
+      <div
+        style={{
+          marginTop: "36px",
+          display: "flex",
+          justifyContent: "center",
+          gap: "16px",
+        }}
+      >
         {meeting?.state === "NotStarted" ? (
-          <Button onClick={handleStartMeeting}>Start</Button>
+          <Button
+            type="primary"
+            onClick={handleStartMeeting}
+            icon={<CaretRightOutlined />}
+          >
+            Start
+          </Button>
         ) : (
-          <Button onClick={handleResetMeeting}>Reset</Button>
+          <Button
+            onClick={handleResetMeeting}
+            type="primary"
+            icon={<RedoOutlined />}
+          >
+            Restart
+          </Button>
         )}
         {meeting?.state === "InProgress" && (
-          <Button onClick={handleNext}>
+          <Button
+            onClick={handleNext}
+            type="primary"
+            icon={<CaretRightOutlined />}
+          >
             {meeting?.speakerQueue?.length === 0 ? "Finish" : "Next"}
           </Button>
         )}
       </div>
-      <div>
-        <h2>Attendees</h2>
-        {meeting.speakers?.map((speaker: any) => (
-          <p key={speaker.id}>{speaker.firstName}</p>
-        ))}
-      </div>
-      <div>Speaker queue</div>
-      {meeting.speakerQueue?.map((speaker: any) => (
-        <p key={speaker}>{speaker}</p>
-      ))}
 
-      <div>Notes</div>
-      <div className="notes">
-        <h2>Notes</h2>
-        <AddNote meetingCode={meetingCode} />
-        <ul>
+      <Flex style={{ gap: "48px" }}>
+        <div className="notes">
+          <h2>Notes</h2>
+          <AddNote meetingCode={meetingCode} />
+
           {meeting.notes?.map(
             (note: { speakerId: number; text: string }, i: number) => (
-              <NoteItem note={note} key={`note-${i}`} />
+              <NoteItem
+                speakerName={getSpeakerNameById(note.speakerId)}
+                text={note.text}
+                key={`note-${i}`}
+              />
             )
           )}
-        </ul>
-      </div>
+        </div>
+        <div className="actions">
+          <h2>Actions</h2>
 
-      <div>Actions</div>
-      <div className="actions">
-        <h2>Actions</h2>
+          {meeting.speakers && (
+            <AddAction meetingCode={meetingCode} speakers={meeting.speakers} />
+          )}
 
-        {meeting.speakers && (
-          <AddAction meetingCode={meetingCode} speakers={meeting.speakers} />
-        )}
-
-        {meeting.actions?.map(
-          (action: { ownerId: number; text: string; id: number }) => (
-            <ActionItem actionItem={action} key={action.id} />
-          )
-        )}
-
-        {/* <ActionItem
-          actionItem={{
-            asignee: "Dylan",
-            text: "This is an action item",
-            completed: false,
-          }}
-        /> */}
-      </div>
-
-      <Link to={`/`}>Back to home</Link>
+          {meeting.actions?.map(
+            (action: { ownerId: number; text: string; id: number }) => (
+              <ActionItem
+                ownerName={getSpeakerNameById(action.ownerId)}
+                text={action.text}
+                key={action.id}
+              />
+            )
+          )}
+        </div>
+      </Flex>
     </div>
   );
 };

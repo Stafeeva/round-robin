@@ -57,6 +57,7 @@ export type Speaker = {
 
 export type Token = {
   speakerId: number;
+  username: string;
   token: string;
 };
 

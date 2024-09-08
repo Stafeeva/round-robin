@@ -5,12 +5,12 @@ import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import "./ActionItem.css";
 
 type ActionItemProps = {
-  actionItem: { ownerId: number; text: string; completed?: boolean };
+  ownerName: string;
+  text: string;
+  completed?: boolean;
 };
 
-const ActionItem: FC<ActionItemProps> = ({ actionItem }) => {
-  const { ownerId, text, completed } = actionItem;
-
+const ActionItem: FC<ActionItemProps> = ({ ownerName, text, completed }) => {
   const [completedState, setCompletedState] = useState<boolean>(
     completed || false
   );
@@ -36,7 +36,7 @@ const ActionItem: FC<ActionItemProps> = ({ actionItem }) => {
             onChange={() => setCompletedState(!completedState)}
             style={{ marginRight: "8px" }}
           />
-          <strong>@{ownerId}: </strong>
+          <strong>@{ownerName}: </strong>
           {text}
         </div>
         <div className="action-item__actions">

@@ -1,0 +1,14 @@
+.login__container > input {
+  width: 300px;
+}
+
+.login__action-buttons {
+  margin-top: 48px;
+  display: flex;
+  justify-content: space-around;
+}
+
+.login__title {
+  margin-bottom: 48px;
+  color: #008080;
+}

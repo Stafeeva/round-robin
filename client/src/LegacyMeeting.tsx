@@ -9,7 +9,7 @@ import {
 
 import { Attendee, Action, Note } from "../../server/serverPrototype";
 import "./App.css";
-import { AddAction } from "./App";
+// import { AddAction } from "./App";
 import NoteItem from "./components/Note";
 import AddNote from "./components/AddNote";
 import ActionItem from "./components/ActionItem";

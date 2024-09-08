@@ -2,6 +2,8 @@ import React, { FC, useState } from "react";
 import { Button, Input } from "antd";
 import { useNavigate } from "react-router";
 
+import "./Login.css";
+
 const Login: FC<{}> = () => {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
@@ -24,7 +26,7 @@ const Login: FC<{}> = () => {
     // TODO: verify response status
     // TODO: handle 401
     const data = await response.json();
-    console.log("data", data);
+    console.log("login data", data);
     localStorage.setItem("token", JSON.stringify(data));
 
     // redirect to home
@@ -32,7 +34,8 @@ const Login: FC<{}> = () => {
   };
 
   return (
-    <div style={{ width: "200px" }}>
+    <div className="login__container">
+      <h1 className="login__title">Login</h1>
       <h2>Username</h2>
       <Input onChange={(e) => setUsername(e.target.value)} value={username} />
       <h2>Password</h2>
@@ -41,11 +44,14 @@ const Login: FC<{}> = () => {
         value={password}
         type="password"
       />
-      <Button onClick={handleLogin}>Login</Button>
-
-      <Button onClick={() => navigate("/create-account")}>
-        Create Account
-      </Button>
+      <div className="action-buttons">
+        <Button onClick={handleLogin} type="primary">
+          Login
+        </Button>
+        <Button onClick={() => navigate("/create-account")} type="primary">
+          Create Account
+        </Button>
+      </div>
     </div>
   );
 };

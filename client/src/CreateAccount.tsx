@@ -31,7 +31,8 @@ const Login: FC<{}> = () => {
   };
 
   return (
-    <div style={{ width: "200px" }}>
+    <div style={{ width: "300px" }}>
+      <h1>Register</h1>
       <h2>First Name</h2>
       <Input onChange={(e) => setFirstName(e.target.value)} value={firstName} />
       <h2>Last Name</h2>
@@ -44,7 +45,14 @@ const Login: FC<{}> = () => {
         value={password}
         type="password"
       />
-      <Button onClick={handleLogin}>Create account</Button>
+      <div className="action-buttons">
+        <Button type="primary" onClick={() => navigate("/login")}>
+          Back to login
+        </Button>
+        <Button type="primary" onClick={handleLogin}>
+          Create account
+        </Button>
+      </div>
     </div>
   );
 };

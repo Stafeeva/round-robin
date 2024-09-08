@@ -83,85 +83,69 @@ const CreateMeeting: FC = () => {
   };
 
   return (
-    <Flex
-      style={{ width: "100%", height: "100vh" }}
-      align="center"
-      vertical
-      justify="space-around"
-    >
-      <Flex
-        vertical
-        gap="middle"
-        style={{
-          width: "400px",
-          border: "1px solid #1677ff",
-          borderRadius: "8px",
-          padding: "72px",
-        }}
-      >
-        <Flex justify="space-between" align="center">
-          Meeting name
-          <Input
-            value={meetingName}
-            style={{ width: "70%" }}
-            onChange={(event) => setMeetingName(event.target.value)}
-          />
-        </Flex>
-
-        <Flex justify="space-between" align="center" gap="6px">
-          Speaker duration
-          <Flex justify="space-around" gap="6px">
-            <Button
-              type={speakerDuration === 60 ? "primary" : "default"}
-              onClick={() => setSpeakerDuration(60)}
-            >
-              1m
-            </Button>
-            <Button
-              type={speakerDuration === 120 ? "primary" : "default"}
-              onClick={() => setSpeakerDuration(120)}
-            >
-              2m
-            </Button>
-            <Button
-              type={speakerDuration === 180 ? "primary" : "default"}
-              onClick={() => setSpeakerDuration(180)}
-            >
-              3m
-            </Button>
-            <Button
-              type={speakerDuration === 300 ? "primary" : "default"}
-              onClick={() => setSpeakerDuration(300)}
-            >
-              5m
-            </Button>
-          </Flex>
-        </Flex>
-        <Flex justify="space-between" align="center" gap="6px">
-          Auto proceed to next speaker
-          <Flex justify="space-around" gap="6px">
-            <Button
-              type={autoProceed ? "primary" : "default"}
-              onClick={() => setAutoProceed(true)}
-            >
-              Yes
-            </Button>
-            <Button
-              type={autoProceed ? "default" : "primary"}
-              onClick={() => setAutoProceed(false)}
-            >
-              No
-            </Button>
-          </Flex>
-        </Flex>
-        <Button
-          type="primary"
-          style={{ marginTop: "48px" }}
-          onClick={onClickCreateMeeting}
-        >
-          Create
-        </Button>
+    <Flex vertical gap="middle">
+      <Flex justify="space-between" align="center">
+        Meeting name
+        <Input
+          value={meetingName}
+          style={{ width: "70%" }}
+          onChange={(event) => setMeetingName(event.target.value)}
+        />
       </Flex>
+
+      <Flex justify="space-between" align="center" gap="6px">
+        Speaker duration
+        <Flex justify="space-around" gap="6px">
+          <Button
+            type={speakerDuration === 60 ? "primary" : "default"}
+            onClick={() => setSpeakerDuration(60)}
+          >
+            1m
+          </Button>
+          <Button
+            type={speakerDuration === 120 ? "primary" : "default"}
+            onClick={() => setSpeakerDuration(120)}
+          >
+            2m
+          </Button>
+          <Button
+            type={speakerDuration === 180 ? "primary" : "default"}
+            onClick={() => setSpeakerDuration(180)}
+          >
+            3m
+          </Button>
+          <Button
+            type={speakerDuration === 300 ? "primary" : "default"}
+            onClick={() => setSpeakerDuration(300)}
+          >
+            5m
+          </Button>
+        </Flex>
+      </Flex>
+      <Flex justify="space-between" align="center" gap="6px">
+        Auto proceed to next speaker
+        <Flex justify="space-around" gap="6px">
+          <Button
+            type={autoProceed ? "primary" : "default"}
+            onClick={() => setAutoProceed(true)}
+          >
+            Yes
+          </Button>
+          <Button
+            type={autoProceed ? "default" : "primary"}
+            onClick={() => setAutoProceed(false)}
+          >
+            No
+          </Button>
+        </Flex>
+      </Flex>
+      <Button
+        type="primary"
+        style={{ marginTop: "48px" }}
+        onClick={onClickCreateMeeting}
+      >
+        Create
+      </Button>
     </Flex>
   );
 };

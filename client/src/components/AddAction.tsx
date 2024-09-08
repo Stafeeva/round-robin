@@ -1,21 +1,31 @@
 import React, { FC } from "react";
-import { Button, Collapse } from "antd";
 import { useNavigate } from "react-router-dom";
+import { Button, Select, Collapse } from "antd";
 import TextArea from "antd/es/input/TextArea";
 
-type AddNoteProps = { meetingCode: string };
+type Speaker = {
+  firstName: string;
+  lastName: string;
+  id: number;
+};
 
-const AddNote: FC<AddNoteProps> = ({ meetingCode }) => {
+const AddAction: FC<{ meetingCode: string; speakers: Speaker[] }> = ({
+  meetingCode,
+  speakers,
+}) => {
+  const [owner, setOwner] = React.useState<number>(speakers?.[0].id);
   const [text, setText] = React.useState<string>("");
 
   const navigate = useNavigate();
 
-  const handleAddNote = async () => {
+  const handleAddAction = async () => {
+    const payload = { ownerId: owner, text };
+
     const token = JSON.parse(localStorage.getItem("token") as string);
 
-    const response = await fetch(`/api/meeting/${meetingCode}/note`, {
+    const response = await fetch(`/api/meeting/${meetingCode}/action`, {
       method: "POST",
-      body: JSON.stringify({ text }),
+      body: JSON.stringify(payload),
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token.token}`,
@@ -27,29 +37,43 @@ const AddNote: FC<AddNoteProps> = ({ meetingCode }) => {
       navigate("/login");
     }
 
-    // else - assuming 201 for created
-    // clear text after note has been added
     setText("");
   };
 
   return (
     <Collapse
       style={{ textAlign: "left" }}
-      ghost
       size="small"
+      ghost
       items={[
         {
-          key: "1",
-          label: "Add note",
+          key: "2",
+          label: "Add action",
           children: (
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                handleAddNote();
+                handleAddAction();
               }}
             >
+              <label htmlFor="assignee">Assignee: </label>
+              <Select
+                id="assignee"
+                defaultValue={speakers?.[0].id}
+                onChange={(e) => {
+                  //   setOwner(parseInt(e));
+                }}
+                style={{ marginBottom: "18px" }}
+              >
+                {speakers?.map((speaker, i) => (
+                  <option key={i} value={speaker.id}>
+                    {speaker.firstName} {speaker.lastName}
+                  </option>
+                ))}
+              </Select>
+
               <TextArea
-                id="noteText"
+                id="actionText"
                 onChange={(e) => setText(e.currentTarget.value)}
                 value={text}
               />
@@ -63,10 +87,10 @@ const AddNote: FC<AddNoteProps> = ({ meetingCode }) => {
               >
                 <Button
                   type="primary"
-                  onClick={handleAddNote}
+                  onClick={handleAddAction}
                   style={{ width: "150px" }}
                 >
-                  Add note
+                  Add Action
                 </Button>
               </div>
             </form>
@@ -77,4 +101,4 @@ const AddNote: FC<AddNoteProps> = ({ meetingCode }) => {
   );
 };
 
-export default AddNote;
+export default AddAction;

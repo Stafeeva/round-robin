@@ -1,0 +1,26 @@
+.layout__container {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  background-color: white;
+  margin: 36px;
+  padding: 36px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+h1 {
+  margin-bottom: 48px;
+  color: #008080;
+}
+
+h2 {
+  font-size: 18px;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 48px;
+}
