@@ -1,4 +1,3 @@
-import * as service from "@App/domain/service";
 import { NotificationService } from "@App/domain/service";
 import * as entity from "@App/domain/entity";
 import { Server as SocketIOServer } from "socket.io";
@@ -17,7 +16,7 @@ export class Service implements NotificationService {
     });
   }
 
-  async notify(meeting: entity.Meeting): Promise<void> {
+  async notify(meeting: entity.MeetingAggregate): Promise<void> {
     this.io.to(meeting.code).emit("meetingUpdated", meeting);
   }
 }

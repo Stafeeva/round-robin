@@ -21,12 +21,10 @@ export class Service implements SpeakerService {
     const hashedPassword = await service.hashPassword(speaker.password);
 
     // write the speaker to the repository
-    const { password, ...serviceSpeaker } =
-      await this.speakerRepository.createSpeaker({
-        ...speaker,
-        password: hashedPassword,
-      });
-    return serviceSpeaker as service.Speaker;
+    return this.speakerRepository.createSpeaker({
+      ...speaker,
+      password: hashedPassword,
+    });
   }
 
   async getSpeaker(username: string): Promise<entity.Speaker> {

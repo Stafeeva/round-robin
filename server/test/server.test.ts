@@ -188,12 +188,6 @@ describe("GET /api/meeting/", () => {
       .set("Authorization", `Bearer ${token}`);
     expect(responseAfterAddingSpeakerToMeeting.status).toBe(200);
     expect(responseAfterAddingSpeakerToMeeting.body.length).toBe(1);
-
-    expect(responseAfterAddingSpeakerToMeeting.body[0].speakers.length).toBe(1);
-
-    expect(
-      responseAfterAddingSpeakerToMeeting.body[0].speakers[0].username
-    ).toBe(speaker.username);
   });
 });
 

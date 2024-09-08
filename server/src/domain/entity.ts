@@ -19,21 +19,27 @@ export type Meeting = {
   autoProceed: boolean;
   state: MeetingState;
   createdAt: Date;
-  speakers: SpeakerWithoutPassword[];
-  // TODO: add notes
-  // TODO: add actions
   speakerQueue: number[];
+  // speakers: SpeakerWithoutPassword[];
+  // notes: Note[];
+  // TODO: add actions
+};
+
+export type MeetingAggregate = Meeting & {
+  speakers: Speaker[];
+  notes: Note[];
 };
 
 export type Speaker = {
   id: number;
   username: string;
-  password: string; // a hashed password
   firstName: string;
   lastName: string;
 };
 
-export type SpeakerWithoutPassword = Omit<Speaker, "password">;
+export type SpeakerWithPassword = Speaker & {
+  password: string;
+};
 
 export type Note = {
   id: number;

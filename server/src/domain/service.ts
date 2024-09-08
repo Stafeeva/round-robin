@@ -16,7 +16,7 @@ export type CreateNote = {
 export interface MeetingService {
   listMeetings(speakerId?: number): Promise<entity.Meeting[]>;
   createMeeting(meeting: CreateMeeting): Promise<entity.Meeting>;
-  getMeeting(code: string): Promise<entity.Meeting>;
+  getMeeting(code: string): Promise<entity.MeetingAggregate>;
   addSpeakerToMeeting(
     meetingCode: string,
     speakerId: number
@@ -27,7 +27,7 @@ export interface MeetingService {
 }
 
 export interface NotificationService {
-  notify(meeting: entity.Meeting): Promise<void>;
+  notify(meeting: entity.MeetingAggregate): Promise<void>;
 }
 
 export type CreateSpeaker = {
