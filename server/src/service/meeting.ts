@@ -1,21 +1,28 @@
 import * as service from "@App/domain/service";
 import { NotificationService, MeetingService } from "@App/domain/service";
-import { MeetingRepository, NoteRepository } from "@App/domain/repository";
+import {
+  MeetingRepository,
+  NoteRepository,
+  ActionRepository,
+} from "@App/domain/repository";
 import * as repository from "@App/domain/repository";
 import * as entity from "@App/domain/entity";
 
 export class Service implements MeetingService {
   private meetingRepository: MeetingRepository;
   private noteRepository: NoteRepository;
+  private actionRepository: ActionRepository;
   private notificationService: NotificationService;
 
   constructor(
     meetingRepository: MeetingRepository,
     noteRepository: NoteRepository,
+    actionRepository: ActionRepository,
     notificationService: NotificationService
   ) {
     this.meetingRepository = meetingRepository;
     this.noteRepository = noteRepository;
+    this.actionRepository = actionRepository;
     this.notificationService = notificationService;
   }
 
@@ -76,7 +83,11 @@ export class Service implements MeetingService {
         meeting.id
       );
 
-      return { ...meeting, speakers, notes };
+      const actions: entity.Action[] = await this.actionRepository.getActions(
+        meeting.id
+      );
+
+      return { ...meeting, speakers, notes, actions };
     } else {
       throw new entity.InvalidMeetingCodeError();
     }
@@ -99,6 +110,8 @@ export class Service implements MeetingService {
 
   async startMeeting(code: string): Promise<entity.Meeting> {
     const meeting = await this.meetingRepository.getMeeting(code);
+
+    // TODO - should have at least one speaker to start the meeting ?
 
     const speakerQueue = service
       .shuffleArray(await this.meetingRepository.getSpeakers(code))
@@ -148,28 +161,45 @@ export class Service implements MeetingService {
     code: string,
     note: service.CreateNote
   ): Promise<entity.Meeting> {
-    // TODO meeting must exist
-    // TODO note must exist
-
     const meeting = await this.meetingRepository.getMeeting(code);
 
     try {
       // add note to the meeting
-      const foo = await this.noteRepository.createNote({
+      await this.noteRepository.createNote({
         meetingId: meeting.id,
         speakerId: note.speakerId,
         text: note.text,
       });
-
-      // TODO
-      // meeting model does not currently contain notes, needs to be added
-      // so the updated meeting can be sent via the notification service
 
       this.notificationService.notify(await this.getMeeting(code));
     } catch (e) {
       console.error(e);
     }
 
-    return meeting;
+    return this.meetingRepository.getMeeting(code);
+  }
+
+  async addActionToMeeting(
+    code: string,
+    action: service.CreateAction
+  ): Promise<entity.Meeting> {
+    const meeting = await this.meetingRepository.getMeeting(code);
+
+    try {
+      await this.actionRepository.createAction({
+        meetingId: meeting.id,
+        createdBy: action.createdBy,
+        ownerId: action.ownerId,
+        text: action.text,
+      });
+
+      this.notificationService.notify(await this.getMeeting(code));
+    } catch (error) {
+      // TODO - handle errors
+      console.error("Error adding action to meeting", error);
+      throw error;
+    }
+
+    return this.meetingRepository.getMeeting(code);
   }
 }

@@ -9,6 +9,7 @@ import { Server } from "../src/server";
 import * as meeting from "@App/repository/meeting";
 import * as speaker from "@App/repository/speaker";
 import * as note from "@App/repository/note";
+import * as action from "@App/repository/action";
 import { Service as MeetingService } from "@App/service/meeting";
 import { Service as SpeakerService } from "@App/service/speaker";
 import * as service from "@App/domain/service";
@@ -64,11 +65,17 @@ const speakerRepository = new speaker.SQLRepository(
 
 const noteRepository = new note.SQLRepository(pureSQLAdapter, pureSQLQueries);
 
+const actionRepository = new action.SQLRepository(
+  pureSQLAdapter,
+  pureSQLQueries
+);
+
 const notificationService = new NotificationService(socketIOServer);
 
 const meetingService = new MeetingService(
   meetingRepository,
   noteRepository,
+  actionRepository,
   notificationService
 );
 const speakerService = new SpeakerService(speakerRepository);
@@ -641,5 +648,36 @@ describe("POST /api/meeting/:code/note", () => {
       .send({ text: "A test note" })
       .expect("Content-Type", /json/)
       .expect(201);
+  });
+});
+
+describe("POST /api/meeting/:code/action", () => {
+  it("adds an action to a meeting", async () => {
+    const { speaker, token } = await setUpLoggedInSpeaker();
+
+    // create a meeting
+    const meeting = await meetingService.createMeeting({
+      name: "test",
+      speakerDuration: 30,
+      autoProceed: false,
+    });
+
+    // with a speaker
+    await request(app)
+      .post(`/api/meeting/${meeting.code}/speaker`)
+      .set("Authorization", `Bearer ${token}`)
+      .send({ speakerId: speaker.id })
+      .expect(201);
+
+    // add an action to the meeting
+    const response = await request(app)
+      .post(`/api/meeting/${meeting.code}/action`)
+      .set("Authorization", `Bearer ${token}`)
+      .send({ text: "A test action", ownerId: speaker.id }) // assign the action to the creator
+      .expect("Content-Type", /json/)
+      .expect(201);
+
+    const meetingWithAction = await meetingService.getMeeting(meeting.code);
+    expect(meetingWithAction.actions.length).toBe(1);
   });
 });

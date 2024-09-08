@@ -8,9 +8,6 @@ export enum MeetingState {
   Ended = "Ended",
 }
 
-// TODO: separate Meeting model for list meetings
-// more info on the individual meeting model ?
-
 export type Meeting = {
   id: number;
   name: string;
@@ -20,14 +17,12 @@ export type Meeting = {
   state: MeetingState;
   createdAt: Date;
   speakerQueue: number[];
-  // speakers: SpeakerWithoutPassword[];
-  // notes: Note[];
-  // TODO: add actions
 };
 
 export type MeetingAggregate = Meeting & {
   speakers: Speaker[];
   notes: Note[];
+  actions: Action[];
 };
 
 export type Speaker = {
@@ -47,6 +42,16 @@ export type Note = {
   speakerId: number;
   text: string;
   createdAt: Date;
+};
+
+export type Action = {
+  id: number;
+  meetingId: number;
+  createdAt: Date;
+  createdBy: number; // speaker who created the action
+  ownerId: number; // speaker who the action is for
+  text: string;
+  completed: boolean;
 };
 
 /**

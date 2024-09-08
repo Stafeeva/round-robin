@@ -6,6 +6,9 @@ import { Link } from "react-router-dom";
 import { io } from "socket.io-client";
 import AddNote from "./components/AddNote";
 import NoteItem from "./components/Note";
+import { useNavigate } from "react-router-dom";
+import { AddAction } from "./App";
+import ActionItem from "./components/ActionItem";
 
 type Token = {
   speakerId: number;
@@ -14,6 +17,8 @@ type Token = {
 
 const Meeting: FC = () => {
   const [meeting, setMeeting] = React.useState<any>({});
+
+  const navigate = useNavigate();
 
   // get meeting code from url
   const meetingCode = useParams().code as string;
@@ -40,6 +45,12 @@ const Meeting: FC = () => {
           Authorization: `Bearer ${token.token}`,
         },
       });
+
+      if (res.status === 401) {
+        // redirect to login if not authorized
+        navigate("/login");
+      }
+
       const data = await res.json();
       setMeeting(data);
     };
@@ -114,7 +125,6 @@ const Meeting: FC = () => {
       ))}
 
       <div>Notes</div>
-      <p>TODO: list notes</p>
       <div className="notes">
         <h2>Notes</h2>
         <AddNote meetingCode={meetingCode} />
@@ -126,7 +136,29 @@ const Meeting: FC = () => {
           )}
         </ul>
       </div>
-      <p>TODO: form to add a note to the meeting</p>
+
+      <div>Actions</div>
+      <div className="actions">
+        <h2>Actions</h2>
+
+        {meeting.speakers && (
+          <AddAction meetingCode={meetingCode} speakers={meeting.speakers} />
+        )}
+
+        {meeting.actions?.map(
+          (action: { ownerId: number; text: string; id: number }) => (
+            <ActionItem actionItem={action} key={action.id} />
+          )
+        )}
+
+        {/* <ActionItem
+          actionItem={{
+            asignee: "Dylan",
+            text: "This is an action item",
+            completed: false,
+          }}
+        /> */}
+      </div>
 
       <Link to={`/`}>Back to home</Link>
     </div>

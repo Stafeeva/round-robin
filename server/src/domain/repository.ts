@@ -48,3 +48,15 @@ export interface NoteRepository {
   getNote(noteId: number): Promise<entity.Note>;
   getNotes(meetingId: number): Promise<entity.Note[]>;
 }
+
+export type CreateAction = {
+  meetingId: number;
+  createdBy: number;
+  ownerId: number;
+  text: string;
+};
+export interface ActionRepository {
+  createAction(action: CreateAction): Promise<entity.Action>;
+  getAction(actionId: number): Promise<entity.Action>;
+  getActions(meetingId: number): Promise<entity.Action[]>;
+}

@@ -13,6 +13,12 @@ export type CreateNote = {
   text: string;
 };
 
+export type CreateAction = {
+  createdBy: number;
+  ownerId: number;
+  text: string;
+};
+
 export interface MeetingService {
   listMeetings(speakerId?: number): Promise<entity.Meeting[]>;
   createMeeting(meeting: CreateMeeting): Promise<entity.Meeting>;
@@ -24,6 +30,10 @@ export interface MeetingService {
   startMeeting(code: string): Promise<entity.Meeting>;
   moveToNextSpeaker(code: string): Promise<entity.Meeting>;
   addNoteToMeeting(code: string, note: CreateNote): Promise<entity.Meeting>;
+  addActionToMeeting(
+    code: string,
+    action: CreateAction
+  ): Promise<entity.Meeting>;
 }
 
 export interface NotificationService {

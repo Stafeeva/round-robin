@@ -184,15 +184,15 @@ const Meeting = ({ attendeeName }: { attendeeName: string }) => {
 
         <div className="actions">
           <h2>Actions</h2>
-          <AddAction attendees={meeting?.attendees || []} />
+          {/* <AddAction attendees={meeting?.attendees || []} /> */}
           {/* {actions?.map((action, i: number) => ( */}
-          <ActionItem
+          {/* <ActionItem
             actionItem={{
               asignee: "Dylan",
               text: "This is an action item",
               completed: false,
             }}
-          />
+          /> */}
           {/* ))} */}
         </div>
       </Flex>

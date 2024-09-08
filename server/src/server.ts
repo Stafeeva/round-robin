@@ -184,7 +184,23 @@ export class Server {
     // delete a note
 
     // TODO action routes
-    // add an action
+    this.app.post("/api/meeting/:code/action", async (req, res) => {
+      const meetingCode = req.params.code;
+      // @ts-ignore
+      const speakerId = req.speakerId as number;
+
+      const newAction = {
+        createdBy: speakerId,
+        ownerId: req.body.ownerId,
+        text: req.body.text,
+      };
+      const meeting = await meetingService.addActionToMeeting(
+        meetingCode,
+        newAction
+      );
+
+      res.status(201).json(meeting);
+    });
     // edit an action ?
     // mark action as completed ? (maybe just edit)
     // delete an action

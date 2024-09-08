@@ -63,3 +63,19 @@ SELECT *
 FROM note
 WHERE meeting_id = :meeting_id
 ORDER BY created_at DESC
+
+-- name: create_action
+INSERT INTO action (meeting_id, created_by, owner_id, text)
+VALUES (:meeting_id, :created_by, :owner_id, :text)
+
+-- name: get_action
+SELECT *
+FROM action
+WHERE id = :id
+
+
+-- name: get_actions
+SELECT *
+FROM action
+WHERE meeting_id = :meeting_id
+ORDER BY created_at DESC
