@@ -54,6 +54,11 @@ export type Action = {
   completed: boolean;
 };
 
+export type TimerEvent = {
+  secondsRemaining: number;
+  meetingCode: string;
+};
+
 /**
  * Errors
  */

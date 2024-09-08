@@ -16,7 +16,12 @@ export class Service implements NotificationService {
     });
   }
 
+  // TODO - rename to notifyMeeting
   async notify(meeting: entity.MeetingAggregate): Promise<void> {
     this.io.to(meeting.code).emit("meetingUpdated", meeting);
+  }
+
+  async notifyTimerEvent(timerEvent: entity.TimerEvent): Promise<void> {
+    this.io.to(timerEvent.meetingCode).emit("timerEvent", timerEvent);
   }
 }
