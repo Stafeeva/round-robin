@@ -2,6 +2,12 @@
 SELECT *
 FROM meeting
 
+-- name: list_meetings_by_speaker_id
+SELECT m.*
+FROM meeting m, meeting_speaker ms
+WHERE m.id = ms.meeting_id
+AND ms.speaker_id = :speaker_id
+
 -- name: get_meeting
 SELECT *
 FROM meeting
@@ -51,3 +57,9 @@ VALUES (:meeting_id, :speaker_id, :text)
 SELECT *
 FROM note
 WHERE id = :id
+
+-- name: get_notes
+SELECT *
+FROM note
+WHERE meeting_id = :meeting_id
+ORDER BY created_at DESC

@@ -4,10 +4,7 @@ import * as db from "@App/domain/db";
 import { CreateMeeting, MeetingRepository } from "@App/domain/repository";
 import { dbSpeakerToEntitySpeaker } from "./speaker";
 
-const dbMeetingToEntityMeeting = (
-  meeting: db.Meeting,
-  speakers: entity.Speaker[]
-): entity.Meeting => {
+const dbMeetingToEntityMeeting = (meeting: db.Meeting): entity.Meeting => {
   return {
     id: meeting.id,
     name: meeting.name,
@@ -16,10 +13,6 @@ const dbMeetingToEntityMeeting = (
     createdAt: meeting.created_at,
     autoProceed: meeting.auto_proceed === 1,
     state: meeting.state as entity.MeetingState,
-    speakers: speakers.map((speaker) => {
-      const { password, ...rest } = speaker;
-      return rest;
-    }),
     speakerQueue: JSON.parse(meeting.speaker_queue),
   };
 };
@@ -36,15 +29,17 @@ export class SQLRepository implements MeetingRepository {
     this.queries = queries;
   }
 
-  async listMeetings(): Promise<entity.Meeting[]> {
-    const meetings = await this.queries.list_meetings({}, this.adapter);
-
-    return Promise.all(
-      meetings.map(async (meeting: db.Meeting) => {
-        const speakers = await this.getSpeakers(meeting.code);
-        return dbMeetingToEntityMeeting(meeting, speakers);
-      })
-    );
+  async listMeetings(speakerId?: number): Promise<entity.Meeting[]> {
+    if (speakerId) {
+      const meetings = await this.queries.list_meetings_by_speaker_id(
+        { speaker_id: speakerId },
+        this.adapter
+      );
+      return meetings.map(dbMeetingToEntityMeeting);
+    } else {
+      const meetings = await this.queries.list_meetings({}, this.adapter);
+      return meetings.map(dbMeetingToEntityMeeting);
+    }
   }
 
   async getMeeting(code: string): Promise<entity.Meeting> {
@@ -57,9 +52,7 @@ export class SQLRepository implements MeetingRepository {
       throw new entity.MeetingNotFoundError();
     }
 
-    const speakers = await this.getSpeakers(code);
-
-    return dbMeetingToEntityMeeting(meeting[0], speakers);
+    return dbMeetingToEntityMeeting(meeting[0]);
   }
 
   async createMeeting(meeting: CreateMeeting): Promise<entity.Meeting> {
@@ -110,14 +103,6 @@ export class SQLRepository implements MeetingRepository {
   ): Promise<void> {
     await this.queries.add_speaker_to_meeting(
       { meeting_id: meetingId, speaker_id: speakerId },
-      this.adapter
-    );
-    return;
-  }
-
-  async addNoteToMeeting(meetingId: number, noteId: number): Promise<void> {
-    await this.queries.add_note_to_meeting(
-      { meeting_id: meetingId, note_id: noteId },
       this.adapter
     );
     return;

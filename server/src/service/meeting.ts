@@ -20,12 +20,14 @@ export class Service implements MeetingService {
   }
 
   async listMeetings(speakerId?: number) {
-    const meetings = await this.meetingRepository.listMeetings();
+    const meetings = await this.meetingRepository.listMeetings(speakerId);
 
     // filter meetings to only include those that the speaker is a part of
-    return meetings.filter((meeting) =>
-      meeting.speakers.some((speaker) => speaker.id === speakerId)
-    );
+    // return meetings.filter((meeting) =>
+    //   meeting.speakers.some((speaker) => speaker.id === speakerId)
+    // );
+
+    return meetings;
   }
 
   async createMeeting(meeting: service.CreateMeeting) {
@@ -63,11 +65,18 @@ export class Service implements MeetingService {
     return this.meetingRepository.createMeeting(createMeeting);
   }
 
-  async getMeeting(code: string) {
+  async getMeeting(code: string): Promise<entity.MeetingAggregate> {
     if (service.isValidMeetingCode(code)) {
       const meeting = await this.meetingRepository.getMeeting(code);
 
-      return meeting;
+      const speakers: entity.Speaker[] =
+        await this.meetingRepository.getSpeakers(code);
+
+      const notes: entity.Note[] = await this.noteRepository.getNotes(
+        meeting.id
+      );
+
+      return { ...meeting, speakers, notes };
     } else {
       throw new entity.InvalidMeetingCodeError();
     }
@@ -102,7 +111,7 @@ export class Service implements MeetingService {
       speakerQueue
     );
 
-    this.notificationService.notify(updatedMeeting);
+    this.notificationService.notify(await this.getMeeting(code));
 
     return updatedMeeting;
   }
@@ -128,7 +137,7 @@ export class Service implements MeetingService {
       speakerQueue
     );
 
-    this.notificationService.notify(updatedMeeting);
+    this.notificationService.notify(await this.getMeeting(code));
     // return the updated meeting
     return updatedMeeting;
   }
@@ -144,19 +153,22 @@ export class Service implements MeetingService {
 
     const meeting = await this.meetingRepository.getMeeting(code);
 
-    // add note to the meeting
-    const foo = await this.noteRepository.createNote({
-      meetingId: meeting.id,
-      speakerId: note.speakerId,
-      text: note.text,
-    });
+    try {
+      // add note to the meeting
+      const foo = await this.noteRepository.createNote({
+        meetingId: meeting.id,
+        speakerId: note.speakerId,
+        text: note.text,
+      });
 
-    // TODO
-    // meeting model does not currently contain notes, needs to be added
-    // so the updated meeting can be sent via the notification service
+      // TODO
+      // meeting model does not currently contain notes, needs to be added
+      // so the updated meeting can be sent via the notification service
 
-    const updatedMeeting = await this.meetingRepository.getMeeting(code);
-    this.notificationService.notify(updatedMeeting);
+      this.notificationService.notify(await this.getMeeting(code));
+    } catch (e) {
+      console.error(e);
+    }
 
     return meeting;
   }

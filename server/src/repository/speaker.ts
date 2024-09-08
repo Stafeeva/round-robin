@@ -5,7 +5,7 @@ import { CreateSpeaker, SpeakerRepository } from "@App/domain/repository";
 
 export const dbSpeakerToEntitySpeaker = (
   speaker: db.Speaker
-): entity.Speaker => {
+): entity.SpeakerWithPassword => {
   return {
     id: speaker.id,
     username: speaker.username,
@@ -34,11 +34,17 @@ export class SQLRepository implements SpeakerRepository {
       last_name: speaker.lastName,
     };
 
-    const res = await this.queries.create_speaker(newSpeakerData, this.adapter);
-    return this.getSpeaker(speaker.username);
+    await this.queries.create_speaker(newSpeakerData, this.adapter);
+
+    // remove password from the response
+    const { password, ...speakerWithoutPassword } = await this.getSpeaker(
+      speaker.username
+    );
+
+    return speakerWithoutPassword;
   }
 
-  async getSpeaker(username: string): Promise<entity.Speaker> {
+  async getSpeaker(username: string): Promise<entity.SpeakerWithPassword> {
     const speakers: db.Speaker[] = await this.queries.get_speaker(
       { username },
       this.adapter

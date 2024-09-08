@@ -173,13 +173,13 @@ const Meeting = ({ attendeeName }: { attendeeName: string }) => {
       </Flex>
       <Flex style={{ width: "800px" }} gap="48px">
         <div className="notes">
-          <h2>Notes</h2>
-          <AddNote author={attendeeName} />
-          <ul>
+          {/* <h2>Notes</h2>
+          <AddNote author={attendeeName} /> */}
+          {/* <ul>
             {notes?.map((note: Note, i: number) => (
               <NoteItem note={note} key={`note-${i}`} />
             ))}
-          </ul>
+          </ul> */}
         </div>
 
         <div className="actions">

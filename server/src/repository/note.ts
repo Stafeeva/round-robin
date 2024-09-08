@@ -5,6 +5,14 @@ import { CreateNote, NoteRepository } from "@App/domain/repository";
 import { OkPacket } from "mysql";
 import { get } from "http";
 
+const dbNoteToEntityNote = (note: db.Note): entity.Note => ({
+  id: note.id,
+  speakerId: note.speaker_id,
+  meetingId: note.meeting_id,
+  text: note.text,
+  createdAt: note.created_at,
+});
+
 export class SQLRepository implements NoteRepository {
   private adapter: PuresqlAdapter;
   private queries: Record<string, puresql.PuresqlQuery<any>>;
@@ -20,7 +28,7 @@ export class SQLRepository implements NoteRepository {
   async createNote(note: CreateNote): Promise<entity.Note> {
     const newNoteData = {
       speaker_id: note.speakerId,
-      meeting_id: note.speakerId,
+      meeting_id: note.meetingId,
       text: note.text,
     };
 
@@ -44,12 +52,15 @@ export class SQLRepository implements NoteRepository {
 
     const note = notes[0];
 
-    return {
-      id: note.id,
-      speakerId: note.speaker_id,
-      meetingId: note.meeting_id,
-      text: note.text,
-      createdAt: note.created_at,
-    };
+    return dbNoteToEntityNote(note);
+  }
+
+  async getNotes(meetingId: number): Promise<entity.Note[]> {
+    const notes: db.Note[] = await this.queries.get_notes(
+      { meeting_id: meetingId },
+      this.adapter
+    );
+
+    return notes.map(dbNoteToEntityNote);
   }
 }

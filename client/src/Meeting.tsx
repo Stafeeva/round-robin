@@ -4,6 +4,8 @@ import { useParams } from "react-router";
 import { Link } from "react-router-dom";
 
 import { io } from "socket.io-client";
+import AddNote from "./components/AddNote";
+import NoteItem from "./components/Note";
 
 type Token = {
   speakerId: number;
@@ -14,7 +16,7 @@ const Meeting: FC = () => {
   const [meeting, setMeeting] = React.useState<any>({});
 
   // get meeting code from url
-  const meetingCode = useParams().code;
+  const meetingCode = useParams().code as string;
   const token: Token = JSON.parse(localStorage.getItem("token") as string);
 
   useEffect(() => {
@@ -113,6 +115,17 @@ const Meeting: FC = () => {
 
       <div>Notes</div>
       <p>TODO: list notes</p>
+      <div className="notes">
+        <h2>Notes</h2>
+        <AddNote meetingCode={meetingCode} />
+        <ul>
+          {meeting.notes?.map(
+            (note: { speakerId: number; text: string }, i: number) => (
+              <NoteItem note={note} key={`note-${i}`} />
+            )
+          )}
+        </ul>
+      </div>
       <p>TODO: form to add a note to the meeting</p>
 
       <Link to={`/`}>Back to home</Link>

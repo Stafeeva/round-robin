@@ -1,20 +1,32 @@
 import React, { FC } from "react";
 import { Button, Input } from "antd";
+import { Link, useNavigate } from "react-router-dom";
 
-type AddNoteProps = { author: string };
+type AddNoteProps = { meetingCode: string };
 
-const AddNote: FC<AddNoteProps> = ({ author }) => {
+const AddNote: FC<AddNoteProps> = ({ meetingCode }) => {
   const [text, setText] = React.useState<string>("");
 
+  const navigate = useNavigate();
+
   const handleAddNote = async () => {
-    await fetch("/api/note", {
+    const token = JSON.parse(localStorage.getItem("token") as string);
+
+    const response = await fetch(`/api/meeting/${meetingCode}/note`, {
       method: "POST",
-      body: JSON.stringify({ author, text }),
+      body: JSON.stringify({ text }),
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${token.token}`,
       },
     });
 
+    // if response is 401 then the token is invalid, redirect to login
+    if (response.status === 401) {
+      navigate("/login");
+    }
+
+    // else - assuming 201 for created
     // clear text after note has been added
     setText("");
   };
@@ -26,12 +38,13 @@ const AddNote: FC<AddNoteProps> = ({ author }) => {
         handleAddNote();
       }}
     >
+      <p>test</p>
       <Input
         id="noteText"
         onChange={(e) => setText(e.currentTarget.value)}
         value={text}
       />
-      <Button>Submit</Button>
+      <Button onClick={handleAddNote}>Submit</Button>
     </form>
   );
 };

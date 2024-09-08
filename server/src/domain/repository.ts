@@ -12,7 +12,7 @@ export type CreateMeeting = {
 };
 
 export interface MeetingRepository {
-  listMeetings(): Promise<entity.Meeting[]>;
+  listMeetings(speakerId?: number): Promise<entity.Meeting[]>;
   getMeeting(code: string): Promise<entity.Meeting>;
   createMeeting(meeting: CreateMeeting): Promise<entity.Meeting>;
   deleteMeeting(code: string): Promise<void>;
@@ -34,7 +34,7 @@ export type CreateSpeaker = {
 
 export interface SpeakerRepository {
   createSpeaker(speaker: CreateSpeaker): Promise<entity.Speaker>;
-  getSpeaker(username: string): Promise<entity.Speaker>;
+  getSpeaker(username: string): Promise<entity.SpeakerWithPassword>;
 }
 
 export type CreateNote = {
@@ -46,5 +46,5 @@ export type CreateNote = {
 export interface NoteRepository {
   createNote(note: CreateNote): Promise<entity.Note>;
   getNote(noteId: number): Promise<entity.Note>;
-  // getNotes(meetingId: number): Promise<entity.Note[]>;
+  getNotes(meetingId: number): Promise<entity.Note[]>;
 }
