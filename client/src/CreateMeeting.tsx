@@ -17,8 +17,6 @@ const CreateMeeting: FC = () => {
   const token: Token = JSON.parse(localStorage.getItem("token") as string);
 
   const onClickCreateMeeting = async () => {
-    console.log("create meeting clicked");
-
     // ensure name is not empty
 
     const payload = {
@@ -39,18 +37,13 @@ const CreateMeeting: FC = () => {
     // join a meeting after creating it
 
     if (response.status === 401) {
-      // TODO - unuauthorized - redirect to login
+      // unuauthorized - redirect to login
+      navigate("/login");
     }
 
     if (response.status === 201) {
       // meeting created
-
-      console.log("response", response);
-
       const data = await response.json();
-
-      console.log("data", data);
-
       const meetingCode = data.code;
 
       const addSpeakerResponse = await fetch(
@@ -64,22 +57,17 @@ const CreateMeeting: FC = () => {
         }
       );
 
-      console.log("addSpeakerResponse", addSpeakerResponse);
-
       // if the speaker was added to the meeting - redirect to the meeting
-
-      // otherwise - show and handle error
-
-      // join the meeting
+      if (addSpeakerResponse.status === 201) {
+        navigate(`/meeting/${meetingCode}`);
+        return;
+      }
     } else {
       // meeing not created
-
-      // TODO - handle error  (perhaps required field not provided / invalid data)
+      // (perhaps required field not provided / invalid data)
 
       console.error("error creating meeting", response);
     }
-
-    //navigate("/meeting/123");
   };
 
   return (

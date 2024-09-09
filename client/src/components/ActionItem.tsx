@@ -1,6 +1,6 @@
-import { Button, Card, Checkbox } from "antd";
 import React, { FC, useState } from "react";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import { Button, Card, Checkbox } from "antd";
 
 import "./ActionItem.css";
 

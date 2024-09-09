@@ -22,11 +22,10 @@ const Login: FC<{}> = () => {
         "Content-Type": "application/json",
       },
     });
+
     // assume we got 200
-    // TODO: verify response status
-    // TODO: handle 401
+
     const data = await response.json();
-    console.log("login data", data);
     localStorage.setItem("token", JSON.stringify(data));
 
     // redirect to home

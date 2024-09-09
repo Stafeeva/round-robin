@@ -29,11 +29,9 @@ const Home: FC = () => {
           navigate("/login");
         }
 
-        // TODO check for 200 status code?
         return response.json();
       })
       .then((data) => {
-        console.log("data", data);
         setMeetings(data);
       });
   }, []);

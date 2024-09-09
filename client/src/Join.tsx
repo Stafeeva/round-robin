@@ -1,24 +1,19 @@
 import { Button, Input } from "antd";
 import React, { FC } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 type Token = {
   speakerId: number;
   token: string;
 };
 
-
-const Main: FC = () => {
+const Join: FC = () => {
   const [meetingCode, setMeetingCode] = React.useState<string>("");
 
   const navigate = useNavigate();
 
   const joinMeeting = async () => {
-    console.log("join meeting with code", meetingCode);
-
-
     const token: Token = JSON.parse(localStorage.getItem("token") as string);
-
 
     const addSpeakerResponse = await fetch(
       `/api/meeting/${meetingCode}/speaker`,
@@ -31,24 +26,15 @@ const Main: FC = () => {
       }
     );
 
-
-    console.log("addSpeakerResponse", addSpeakerResponse);
-
     if (addSpeakerResponse.status === 401) {
-      // TODO - unuauthorized - redirect to login
+      // navigate to login page
+      navigate("/login");
     }
 
     if (addSpeakerResponse.status === 201) {
-      
-    
-      console.log("added speaker, redirect to meeting page");
-
       // redirect to meeting page
       navigate(`/meeting/${meetingCode}`);
     }
-
-
-
   };
 
   return (
@@ -64,4 +50,4 @@ const Main: FC = () => {
   );
 };
 
-export default Main;
+export default Join;

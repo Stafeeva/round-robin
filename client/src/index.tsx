@@ -1,7 +1,7 @@
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
-import Main from "./Main";
+import Join from "./Join";
 import Home from "./Home";
 import CreateMeeting from "./CreateMeeting";
 import Meeting from "./Meeting";
@@ -40,7 +40,7 @@ const router = createBrowserRouter([
     path: "/join",
     element: (
       <Layout>
-        <Main />
+        <Join />
       </Layout>
     ),
   },

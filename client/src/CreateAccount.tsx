@@ -10,11 +10,7 @@ const Login: FC<{}> = () => {
   const [lastName, setLastName] = useState("");
 
   const handleLogin = async () => {
-    console.log("username", username);
-    console.log("password", password);
-
     // login user
-
     const response = await fetch("/api/speaker", {
       method: "POST",
       body: JSON.stringify({ username, password, firstName, lastName }),
@@ -22,8 +18,6 @@ const Login: FC<{}> = () => {
         "Content-Type": "application/json",
       },
     });
-
-    console.log("response", response);
 
     if (response.status === 201) {
       navigate("/login");

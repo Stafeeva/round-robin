@@ -1,17 +1,16 @@
 import { Avatar, Button, Flex } from "antd";
 import React, { FC, useEffect } from "react";
 import { useParams } from "react-router";
-import { Link } from "react-router-dom";
 import {
   UserOutlined,
   CaretRightOutlined,
   RedoOutlined,
 } from "@ant-design/icons";
-
 import { io } from "socket.io-client";
+import { useNavigate } from "react-router-dom";
+
 import AddNote from "./components/AddNote";
 import NoteItem from "./components/Note";
-import { useNavigate } from "react-router-dom";
 import AddAction from "./components/AddAction";
 import ActionItem from "./components/ActionItem";
 
@@ -187,7 +186,6 @@ const Meeting: FC = () => {
     <div style={{ width: "100%" }}>
       <h1>{meeting.name}</h1>
       <div>
-
         <Flex style={{ gap: "24px", justifyContent: "center" }}>
           {meeting.speakers?.map((speaker: Speaker) => (
             <div
@@ -199,11 +197,7 @@ const Meeting: FC = () => {
                 borderRadius: "8px",
               }}
             >
-              <Avatar
-                size={48}
-                icon={<UserOutlined />}
-                // style={{ backgroundColor: "#008080" }}
-              />
+              <Avatar size={48} icon={<UserOutlined />} />
               <p key={speaker.id}>{speaker.firstName}</p>
             </div>
           ))}
@@ -264,7 +258,7 @@ const Meeting: FC = () => {
       </div>
 
       <Flex style={{ gap: "48px" }}>
-        <div style={{width: "50%"}} className="notes">
+        <div style={{ width: "50%" }} className="notes">
           <h2>Notes</h2>
           <AddNote meetingCode={meetingCode} />
 
@@ -278,7 +272,7 @@ const Meeting: FC = () => {
             )
           )}
         </div>
-        <div style={{width: "50%"}}  className="actions">
+        <div style={{ width: "50%" }} className="actions">
           <h2>Actions</h2>
 
           {meeting.speakers && (
