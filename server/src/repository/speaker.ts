@@ -50,8 +50,6 @@ export class SQLRepository implements SpeakerRepository {
       this.adapter
     );
 
-    // TODO handle not found
-
     return dbSpeakerToEntitySpeaker(speakers[0]);
   }
 }

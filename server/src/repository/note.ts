@@ -47,8 +47,6 @@ export class SQLRepository implements NoteRepository {
       this.adapter
     );
 
-    // TODO handle not found
-
     const note = notes[0];
 
     return dbNoteToEntityNote(note);
