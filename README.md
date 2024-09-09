@@ -1,4 +1,8 @@
-# round-robin
+# Round Robin
+
+## A web application to streamline and enhance daily standup meetings for distributed teams
+
+The application’s architecture includes a server, a database, and a client-side application (user interface). Communication between a client and the server happens via REST API, and via websockets. Websockets allow multiple users to get updates in real time.
 
 To run the application, use the following command:
 

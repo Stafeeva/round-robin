@@ -130,9 +130,19 @@ export class Server {
 
     this.app.post("/api/meeting/:code/speaker", async (req, res) => {
       try {
+
+
+        // @ts-ignore
+        const speakerId = req.speakerId as number;
+
+
+
+        // console.log("add speaker to meeting", req.params, "....", req.params.code, req.body.speakerId);
+
+
         await meetingService.addSpeakerToMeeting(
           req.params.code,
-          req.body.speakerId
+          speakerId
         );
         res.status(201).json({ message: "Speaker added to meeting" });
       } catch (error) {

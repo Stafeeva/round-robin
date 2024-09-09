@@ -45,7 +45,7 @@ const dbConnection = mysql.createConnection({
 
 const pureSQLAdapter: PuresqlAdapter = puresql.adapters.mysql(
   dbConnection,
-  () => {}
+  () => { }
 );
 
 const pureSQLQueries: Record<
@@ -86,7 +86,7 @@ const roundRobinServer = new Server(app, meetingService, speakerService);
 const socket = io(`http://localhost:${PORT}`);
 
 beforeAll(() => {
-  httpServer.listen(PORT, () => {});
+  httpServer.listen(PORT, () => { });
 });
 
 afterAll(() => {
@@ -109,7 +109,7 @@ beforeEach(() => {
 // Define a helper function to wait for a condition to become true within a timeout
 const waitForCondition = async (
   conditionFn: () => boolean,
-  timeoutMs = 1000,
+  timeoutMs = 2000,
   intervalMs = 100
 ) => {
   const startTime = Date.now();

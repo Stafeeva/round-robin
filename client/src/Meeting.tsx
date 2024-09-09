@@ -187,7 +187,7 @@ const Meeting: FC = () => {
     <div style={{ width: "100%" }}>
       <h1>{meeting.name}</h1>
       <div>
-        <h2>Attendees</h2>
+
         <Flex style={{ gap: "24px", justifyContent: "center" }}>
           {meeting.speakers?.map((speaker: Speaker) => (
             <div
@@ -200,7 +200,7 @@ const Meeting: FC = () => {
               }}
             >
               <Avatar
-                size={64}
+                size={48}
                 icon={<UserOutlined />}
                 // style={{ backgroundColor: "#008080" }}
               />
@@ -264,7 +264,7 @@ const Meeting: FC = () => {
       </div>
 
       <Flex style={{ gap: "48px" }}>
-        <div className="notes">
+        <div style={{width: "50%"}} className="notes">
           <h2>Notes</h2>
           <AddNote meetingCode={meetingCode} />
 
@@ -278,7 +278,7 @@ const Meeting: FC = () => {
             )
           )}
         </div>
-        <div className="actions">
+        <div style={{width: "50%"}}  className="actions">
           <h2>Actions</h2>
 
           {meeting.speakers && (

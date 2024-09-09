@@ -61,7 +61,7 @@ const AddAction: FC<{ meetingCode: string; speakers: Speaker[] }> = ({
                 id="assignee"
                 defaultValue={speakers?.[0].id}
                 onChange={(e) => {
-                  //   setOwner(parseInt(e));
+                     setOwner(Number(e));
                 }}
                 style={{ marginBottom: "18px" }}
               >

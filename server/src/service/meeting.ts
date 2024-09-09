@@ -130,6 +130,9 @@ export class Service implements MeetingService {
     // add the speaker to the meeting
     await this.meetingRepository.addSpeakerToMeeting(meeting.id, speakerId);
 
+    this.notificationService.notify(await this.getMeeting(meetingCode));
+
+
     return meeting;
   }
 
@@ -165,6 +168,8 @@ export class Service implements MeetingService {
   }
 
   startTimer(meeting: entity.Meeting) {
+
+    /*
     this.cancelTimer(meeting);
 
     const cancelTimeout = startCountdown(
@@ -172,28 +177,23 @@ export class Service implements MeetingService {
 
       // timer tick
       async (secondsRemaining: number) => {
-        this.notificationService.notifyTimerEvent({
-          secondsRemaining,
-          meetingCode: meeting.code,
-        });
+        this.notificationService.notifyTimerEvent({ secondsRemaining, meetingCode: meeting.code });
       },
 
       // timer complete
       async () => {
-        this.notificationService.notifyTimerEvent({
-          secondsRemaining: 0,
-          meetingCode: meeting.code,
-        });
+        this.notificationService.notifyTimerEvent({ secondsRemaining: 0, meetingCode: meeting.code });
 
         delete this.meetingCodeToTimeout[meeting.code];
 
-        if (meeting.autoProceed) {
+        if (meeting.autoProceed)
           await this.moveToNextSpeaker(meeting.code);
-        }
       }
     );
 
     this.meetingCodeToTimeout[meeting.code] = cancelTimeout;
+
+    */
   }
 
   async moveToNextSpeaker(code: string): Promise<entity.Meeting> {

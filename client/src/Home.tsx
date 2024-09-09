@@ -16,7 +16,6 @@ const Home: FC = () => {
     }
 
     const parsedToken = JSON.parse(token as string);
-    console.log("parsedToken", parsedToken);
 
     // fetch list of meetings from api
     fetch("/api/meeting", {
